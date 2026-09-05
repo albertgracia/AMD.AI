@@ -1,5 +1,6 @@
 # AMD.AI
 Proyecto dual enfocado en:  Skill local-ai-use (✅ COMPLETADO) - Catálogo oficial AMD para ejecutar/optimizar LLMs locales en hardware AMD Dashboard IA (🟡 EN PROGRESO) - Interfaz web para gestionar modelos, benchmarks, auto-tuning y generación de scripts optimizados
+
 🎯 1. VISIÓN GENERAL DEL PROYECTO
 Nombre: AMD.AI
 Ubicación: G:\Proyectos\AMD.AI\
@@ -15,6 +16,8 @@ Hardware Objetivo
 GPU: AMD Radeon RX 9070 16GB (RDNA 4 / gfx1103 Vulkan, gfx1201 HIP)
 CPU: AMD Ryzen 7 7800X3D 8-Core (Zen 4)
 ROCm: 7.2.0 vía _rocm_sdk_devel Python package
+
+
 📁 2. ESTRUCTURA DEL REPOSITORIO
 text
 
@@ -79,8 +82,14 @@ G:\Proyectos\AMD.AI\
 ├── fix_indent.py                          # Utilidad indentación
 ├── *.url                                  # Enlaces a documentación AMD
 └── skills/local-ai-use/evals/regression_tests.py
+
+
+
 ⚙️ 3. COMPONENTES PRINCIPALES
+
+
 3.1 Skill local-ai-use (✅ COMPLETADO)
+
 Funcionalidades
 Script	Capacidad	Uso Principal
 detect_local.py	Detección GPU, validación backends, matriz compatibilidad	Setup inicial, CI/CD
@@ -98,7 +107,10 @@ Datos de Configuración
 model_compatibility.json: 10 modelos × 3 backends (Vulkan/HIP/CPU)
 gpu_presets.json: Presets para RX 9070, RX 7900 XTX, MI300X, Ryzen AI, EPYC
 quantization_guide.json: 18 niveles de cuantización con factores VRAM
+
 3.2 Dashboard IA (🟡 EN PROGRESO - MVP)
+
+
 Stack Tecnológico
 Capa	Tecnología	Estado
 Backend	FastAPI 0.115 + Uvicorn	✅ main.py creado
@@ -125,12 +137,16 @@ models_tab.html: Lista modelos, filtros, selección, export CSV
 benchmark_tab.html: Formulario benchmark, progreso, resultados
 tuning_tab.html: Selector perfil, progreso, resultados presets
 launch_tab.html: Selector modelo/preset, preview .bat, ejecutar
+
+
 🔬 4. HALLAZGOS TÉCNICOS CLAVE (Validados Experimentalmente)
 4.1 CPU vs GPU para Qwen3.5-9B-Q4_K (5.56 GB)
 Backend	Config	Decode tok/s	Prefill tok/s	VRAM
 HIP GPU	ngl=-1	3,461	1,556	6.6 GB
 Vulkan GPU	ngl=-1	2,887	924	6.1 GB
 CPU (Zen 4)	ngl=0	27,454 ⚡	1,556	512 MB
+
+
 🎯 Conclusión Crítica: Para modelos ≤8GB Q4_K, CPU Zen 4 es 2.7-9x más rápido que GPU. La GPU RX 9070 no está bien aprovechada por kernels actuales.
 
 4.2 HIP vs Vulkan en GPU (RX 9070)
@@ -148,6 +164,8 @@ Batch	Prefill tok/s	Decode tok/s	Eficiencia
 1024	395	3,368	67% ⭐
 2048	294	3,336	25%
 4096	428	3,367	18%
+
+
 🎯 Óptimo: batch=1024 (mejor eficiencia). Batch >2048 causa contención memoria/sincronización.
 
 4.4 Escalabilidad n_gpu_layers (HIP)
@@ -158,6 +176,8 @@ ngl	Prefill tok/s	Decode tok/s	Eficiencia
 30	392	6,979	93%
 40	388	3,389	92%
 0 (CPU)	1,110	27,454	264% ⭐
+
+
 🎯 Sweet spot: ngl=10-20 para híbrido. ngl=0 (CPU) es dramáticamente más rápido para modelos pequeños.
 
 4.5 Modelos Validados (RX 9070 16GB)
@@ -165,6 +185,8 @@ Modelo	Cuantización	Tamaño	Backend Óptimo	Config Recomendada
 Qwen3.5-9B	Q4_K_XL	5.56 GB	CPU (balanced)	ngl=0, p=512, g=256, b=2048, fa=off
 Qwen3.5-9B	Q4_K_XL	5.56 GB	HIP (latency)	ngl=-1, p=2048, g=256, b=1024, fa=auto
 Qwen3.8-27B	Q3_K	12.24 GB	HIP (balanced)	ngl=-1, p=2048, g=256, b=2048, fa=auto
+
+
 🚀 5. CONFIGURACIONES ÓPTIMAS RECOMENDADAS
 5.1 Para Máximo Throughput (Decode)
 bash
@@ -201,6 +223,9 @@ bash
 # HIP - Menor VRAM con buen decode
 llama-server -ngl -1 -p 512 -n 256 -b 2048 -fa auto -ctk q4_0 -ctv q4_0
 # VRAM: ~6.6 GB | Decode: 3,543 tok/s
+
+
+
 🐛 6. TROUBLESHOOTING COMÚN
 Error	Causa	Solución
 exit -1073741515 HIP	ROCm DLLs no en PATH	Añadir _rocm_sdk_devel\bin a PATH permanentemente
@@ -208,6 +233,8 @@ invalid parameter: -c	Flag ctx incorrecta	Usar -p (prompt) y -n (gen), no -c / -
 OOM	VRAM insuficiente	Reducir n_gpu_layers, batch_size, usar cache_type q4_0
 Flash Attention not supported	FA no disponible en RDNA 4	Usar -fa off o -fa auto (SDPA fallback)
 Model not found	Path GGUF incorrecto	Verificar path absoluto, usar detect_local.py
+
+
 📋 7. COMANDOS CANÓNICOS (Copiar-Pegar)
 Detección de Entorno
 bash
@@ -258,7 +285,10 @@ cd dashboard
 pip install -r requirements.txt
 python main.py                    # Desarrollo
 uvicorn main:app --host 0.0.0.0 --port 9090 --reload  # Producción LAN
+
 # Acceso: http://localhost:9090 | http://<IP-LAN>:9090
+
+
 📊 8. ESTADO ACTUAL POR COMPONENTE
 Componente	Estado	Ubicación	Notas
 Skill local-ai-use	✅ COMPLETADO	skills/local-ai-use/	4 scripts + data + evals + docs
@@ -275,13 +305,17 @@ Tab Tuning	⏳ PENDIENTE	templates/partials/	Paso 5
 Tab Launch	⏳ PENDIENTE	templates/partials/	Paso 6
 WebSocket	⏳ PENDIENTE	main.py	Paso 7
 Blog Generator	⏳ PENDIENTE	utils/blog_generator.py	Paso 2
+
+
 🗺️ 9. ROADMAP Y PRÓXIMOS PASOS
+
 FASE 0: Fundacion ✅ COMPLETADA
  Skill local-ai-use completo (detect, bench, tune, analyze)
  Scripts validados
  Data: model_compatibility, gpu_presets, quantization_guide
  Evals: baselines + regression_tests
  Docs: ENTORNO, BENCHMARK, ANALYSIS, AUTO_TUNING, IMPLEMENTATION_SUMMARY
+ 
 FASE 1: Dashboard MVP 🟡 EN PROGRESO
 Paso 1: Setup Base ⏳ PENDIENTE
  Crear estructura dashboard/ (ya existe)
@@ -300,10 +334,12 @@ Paso 3-7: Tabs + Integración ⏳ PENDIENTE
  Tab Tuning (selector perfil, progreso, presets)
  Tab Launch (generar .bat, preview, ejecutar)
  WebSocket + Notificaciones + Polish
+ 
 FASE 2: Event Sourcing + Blog Pipeline ⏳ FUTURO
  Event Logger completo
  Blog Draft Generator (Astro-ready)
  Blog Sync automático a repo Astro
+ 
 FASE 3: Dashboard Avanzado ⏳ FUTURO
  Análisis visual (Chrome Trace, Plotly)
  Historial runs + filtros
@@ -311,6 +347,8 @@ FASE 3: Dashboard Avanzado ⏳ FUTURO
  CI/CD Integration
  Presets Editor visual
  Multi-usuario + Auth
+
+
 💾 10. ARCHIVOS DE RESULTADOS GENERADOS
 Documentación (docs/)
 text
@@ -350,6 +388,8 @@ baselines/
 ├── qwen35_9b_vulkan_v1.json
 ├── qwen35_9b_cpu_v1.json
 └── qwen38_27b_hip_v1.json
+
+
 🎯 11. RECOMENDACIONES
 1. Priorizar Dashboard MVP (Paso 1-2)
 Estructura y main.py ya existen
@@ -372,6 +412,9 @@ Acción: Contribuir a amd/skills repo
 6. Testing de Modelos
 Solo 10 modelos testeados
 Añadir: Qwen3.8-9B-Distill, Apertus, InternVL, Llama-Vision
+
+
+
 📈 12. METRICAS DE ÉXITO
 KPI	Target	Estado
 Skill local-ai-use completo	✅	100%
@@ -380,6 +423,8 @@ Dashboard MVP funcional	🟡	30%
 Event logging	⏳	0%
 Blog automation	⏳	0%
 Documentación completa	✅	100%
+
+
 🔗 13. INTEGRACIÓN AMD SKILLS CATALOG
 El skill local-ai-use se integra con:
 
@@ -392,9 +437,8 @@ Auto-selección de backend vía gpu_presets.json basado en deviceID/gfx_version.
 📝 14. NOTAS TÉCNICAS IMPORTANTES
 ROCm en Windows: Requiere _rocm_sdk_devel en PATH permanentemente
 
-text
+C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\_rocm_sdk_devel\bin
 
-C:\Users\leobc\AppData\Local\Programs\Python\Python313\Lib\site-packages\_rocm_sdk_devel\bin
 Diferencias Arquitectura:
 
 Vulkan: gfx1103, Wave64, KHR_coopmat
