@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+.venv/
+venv/
+env/
+
+# Models (GGUF - gigabytes)
+models/
+*.gguf
+*.bin
+*.safetensors
+
+# Data temporales y logs
+dashboard/data/events.jsonl
+dashboard/data/bench_*.csv
+dashboard/data/bench_*.json
+dashboard/data/generated_bats/
+docs/traces/
+docs/baselines/
+*.chrome_trace.json
+*.prometheus.metrics
+*.csv
+*.jsonl
+
+# Backup
+*.backup*
+AMD.AI.backup*
+
+# Archivos internos de desarrollo
+encoding_check.txt
+fix_indent.py
+*.url
+AGENTS.md
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables sensibles
+.env
+.env.local
+.env.production
+
+# ROCm SDK local (no versionear)
+*_rocm_sdk_devel*
+
+# Eventos y logs del dashboard
+*.log
+logs/
