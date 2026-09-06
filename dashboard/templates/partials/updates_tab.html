@@ -1,0 +1,94 @@
+<div class="card p-6 rounded-lg" x-data="{ local: [], latest: {}, checked: '', loading: true, error: '', localMax: null, updMsg: '', updRunning: false, hipMsg: '', hipRunning: false }" x-init="fetch('/api/llama/updates').then(r => r.json()).then(d => { local = d.local || []; latest = d.latest || {}; checked = d.checked_at || ''; localMax = d.local_max_build || null; loading = false; }).catch(e => { loading = false; error = String(e); })">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
+        <div>
+            <h2 class="text-xl font-bold">Actualizaciones de llama.cpp</h2>
+            <p class="text-sm text-slate-400">Tus builds locales frente a la última release oficial de ggml-org/llama.cpp</p>
+        </div>
+        <button class="bg-blue-600 px-4 py-2 rounded whitespace-nowrap" @click="loading = true; error = ''; fetch('/api/llama/updates').then(r => r.json()).then(d => { local = d.local || []; latest = d.latest || {}; checked = d.checked_at || ''; localMax = d.local_max_build || null; loading = false; }).catch(e => { loading = false; error = String(e); })" :disabled="loading">
+            <span x-text="loading ? 'Comprobando...' : 'Volver a comprobar'"></span>
+        </button>
+    </div>
+    <p class="text-xs text-slate-500 mb-4" x-text="checked ? ('Revisado: ' + checked.slice(0, 19).replace('T', ' ')) : ''"></p>
+    <p class="text-sm text-red-300 mb-4" x-text="error"></p>
+
+    <!-- Veredicto -->
+    <div class="rounded-lg p-4 mb-4 border" x-show="latest && latest.tag" :class="(localMax && latest.build && localMax >= latest.build) ? 'bg-green-500/10 border-green-500/40' : 'bg-yellow-500/10 border-yellow-500/40'">
+        <p class="font-bold" x-show="localMax && latest.build && localMax >= latest.build">Estás al día: tu build <span class="font-mono" x-text="'b' + localMax"></span> coincide o supera la última release <span class="font-mono" x-text="latest.tag"></span>.</p>
+        <p class="font-bold" x-show="localMax && latest.build && localMax < latest.build">Actualización disponible: vas por <span class="font-mono" x-text="'b' + localMax"></span> y la última es <span class="font-mono" x-text="latest.tag"></span>.</p>
+        <p class="font-bold" x-show="!(localMax && latest.build)">Comparación automática no disponible (las releases nuevas usan tags vX.Y sin número de build). Revisa la tabla y la fecha de la release.</p>
+        <p class="text-sm text-slate-300 mt-1" x-show="localMax && latest.build && localMax < latest.build">Descarga el asset Windows que corresponda (Vulkan o HIP/ROCm) desde la tabla de abajo.</p>
+    </div>
+
+    <div class="rounded-lg p-4 mb-4 border border-slate-700">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <p class="font-bold">Backend HIP (compilado local)</p>
+                <p class="text-xs text-slate-400">Hace git pull y recompila con tu ROCm SDK. Tarda bastante; no cierres el servidor mientras tanto.</p>
+            </div>
+            <button class="bg-purple-600 px-4 py-2 rounded whitespace-nowrap" :disabled="hipRunning" @click="hipMsg = ''; hipRunning = true; fetch('/api/llama/rebuild-hip', {method: 'POST'}).then(r => r.json().then(d => ({ok: r.ok, body: d}))).then(d => { if (!d.ok || !d.body.job_id) { hipRunning = false; hipMsg = 'Error: ' + (d.body.detail || 'no se pudo iniciar'); return; } const jid = d.body.job_id; const poll = () => fetch('/api/llama/rebuild-hip/status/' + jid).then(r => r.json()).then(s => { if (s.status === 'running' || s.status === 'queued') { hipMsg = (s.progress || 0) + '% ' + (s.message || ''); setTimeout(poll, 5000); } else { hipRunning = false; if (s.status === 'completed') hipMsg = 'HIP recompilado en ' + (((s.result || {}).path) || '') + '.'; else hipMsg = 'Error: ' + (s.message || s.detail || s.status); } }).catch(e => { hipRunning = false; hipMsg = 'Error: ' + e; }); poll(); }).catch(e => { hipRunning = false; hipMsg = 'Error: ' + e; })"><span x-text="hipRunning ? 'Recompilando...' : 'Recompilar HIP'">Recompilar HIP</span></button>
+        </div>
+        <p class="text-sm mt-2" :class="hipMsg.startsWith('Error') ? 'text-red-300' : 'text-green-300'" x-text="hipMsg"></p>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Builds locales -->
+        <div>
+            <h3 class="font-bold mb-2">Instalado ahora <span class="text-xs font-normal text-slate-400" x-text="'(' + local.length + ' builds)'"></span></h3>
+            <div class="space-y-2">
+                <template x-for="b in local" :key="b.path">
+                    <div class="p-3 bg-slate-800 rounded border border-slate-700">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-mono font-bold" x-text="b.build ? ('b' + b.build) : 'build ?'"></span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs" :class="b.kind === 'hip' ? 'bg-green-500/15 text-green-300 border border-green-500/30' : (b.kind === 'vulkan' ? 'bg-blue-500/15 text-blue-300 border border-blue-500/30' : 'bg-slate-700 text-slate-300')" x-text="b.kind"></span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-yellow-500/15 border border-yellow-500/30 text-yellow-300" x-show="latest && latest.build && b.build && b.build >= latest.build">al día</span>
+                        </div>
+                        <p class="font-mono text-xs text-slate-400 break-all mt-1" x-text="b.path"></p>
+                    </div>
+                </template>
+                <p class="text-sm text-slate-500" x-show="!local.length && !loading">No se detectaron builds en G:\llama.cpp\bin ni en build-hip\bin.</p>
+            </div>
+        </div>
+        <!-- Última release -->
+        <div x-show="latest && latest.tag">
+            <h3 class="font-bold mb-2">Última release oficial</h3>
+            <div class="p-3 bg-slate-800 rounded border border-slate-700">
+                <p><span class="text-slate-400 text-sm">Tag: </span><span class="font-mono font-bold" x-text="latest.tag"></span></p>
+                <p class="text-sm mt-1" x-text="latest.name"></p>
+                <p class="text-xs text-slate-500 mt-1">Publicada: <span class="font-mono" x-text="(latest.published_at || '').slice(0, 10)"></span> · <a class="text-blue-300 underline" :href="latest.url" target="_blank">ver en GitHub</a></p>
+                <details class="mt-2">
+                    <summary class="text-xs text-slate-300 cursor-pointer hover:text-white">Notas de la release</summary>
+                    <pre class="json-preview mt-2 whitespace-pre-wrap" x-text="latest.notes || 'Sin notas'"></pre>
+                </details>
+            </div>
+            <h3 class="font-bold mt-4 mb-2">Descargas Windows recomendadas</h3>
+            <table class="w-full text-sm">
+                <thead><tr class="text-left text-slate-400"><th class="p-2">Asset</th><th class="p-2">Tamaño</th><th class="p-2">Manual</th><th class="p-2">Auto</th></tr></thead>
+                <tbody>
+                    <template x-for="a in (latest.assets || [])" :key="a.name">
+                        <tr class="border-t border-slate-700">
+                            <td class="p-2 font-mono text-xs break-all" x-text="a.name"></td>
+                            <td class="p-2 font-mono" x-text="a.size_mb + ' MB'"></td>
+                            <td class="p-2"><a class="text-blue-300 underline text-xs" :href="a.url" target="_blank">Descargar</a></td>
+                            <td class="p-2"><button class="bg-green-600 px-3 py-1 rounded text-xs" :disabled="updRunning" @click="updMsg = ''; updRunning = true; fetch('/api/llama/update', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({asset_url: a.url, filename: a.name})}).then(r => r.json().then(d => ({ok: r.ok, body: d}))).then(d => { if (!d.ok || !d.body.job_id) { updRunning = false; updMsg = 'Error: ' + (d.body.detail || 'no se pudo iniciar'); return; } const jid = d.body.job_id; const poll = () => fetch('/api/llama/update/status/' + jid).then(r => r.json()).then(s => { if (s.status === 'running' || s.status === 'queued') { updMsg = (s.progress || 0) + '% ' + (s.message || ''); setTimeout(poll, 2000); } else { updRunning = false; if (s.status === 'completed') updMsg = 'Instalado en ' + (((s.result || {}).path) || '') + '. Pulsa Volver a comprobar.'; else updMsg = 'Error: ' + (s.message || s.detail || s.status); } }).catch(e => { updRunning = false; updMsg = 'Error: ' + e; }); poll(); }).catch(e => { updRunning = false; updMsg = 'Error: ' + e; })">Instalar</button></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+            <p class="text-xs text-slate-500 mt-2" x-text="'Mostrando ' + ((latest.assets || []).length) + ' de ' + (latest.assets_total || 0) + ' assets. Instalar lo descarga e instala solo en G:\\llama.cpp\\bin sin tocar tu build actual.'"></p>
+            <p class="text-sm mt-2" :class="updMsg.startsWith('Error') ? 'text-red-300' : 'text-green-300'" x-text="updMsg"></p>
+        </div>
+        <div x-show="latest && latest.error">
+            <h3 class="font-bold mb-2">GitHub no disponible</h3>
+            <p class="text-sm text-slate-400" x-text="latest.error"></p>
+            <p class="text-sm text-slate-400 mt-2">Tus builds locales se muestran igual a la izquierda.</p>
+        </div>
+    </div>
+    <div class="card p-4 mt-4" x-data="{ evts: [] }" x-init="fetch('/api/events?limit=5&amp;prefix=update.').then(r => r.json()).then(d => { evts = d.events || []; }).catch(() => { evts = []; })">
+        <h3 class="font-bold mb-2 text-sm">Actividad reciente: actualizaciones</h3>
+        <ul class="space-y-1">
+            <template x-for="e in evts" :key="(e.timestamp || '') + (e.event_type || '')">
+                <li class="text-xs font-mono text-slate-300 truncate"><span class="text-cyan-300" x-text="e.event_type"></span> <span class="text-slate-500" x-text="(e.timestamp || '').slice(0, 19).replace('T', ' ')"></span></li>
+            </template>
+        </ul>
+        <p class="text-xs text-slate-500" x-show="!evts.length">Sin actividad de este tipo todavía.</p>
+    </div>
+</div>

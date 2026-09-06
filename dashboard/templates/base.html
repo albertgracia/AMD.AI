@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMD.AI Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M13 10V3L4 14h7v7l9-11h-7z'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.0/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        body {
+            background-color: #020617;
+            background-image:
+                radial-gradient(60rem 30rem at 10% -10%, rgba(239, 68, 68, 0.12), transparent 60%),
+                radial-gradient(50rem 26rem at 90% 0%, rgba(37, 99, 235, 0.14), transparent 60%);
+            color: #f8fafc;
+        }
+        ::selection { background: rgba(239, 68, 68, 0.4); }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .card {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px solid #1e293b;
+            border-radius: 1rem;
+        }
+        .card-hover { transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45); border-color: #334155; }
+        .seg-btn { transition: all 0.15s ease; }
+        .seg-btn.active { background-color: #2563eb; color: #fff; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45); }
+        .seg-btn:not(.active):hover { background-color: #1e293b; }
+        .fade-enter { animation: fadeSlide 0.25s ease; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        .toast-in { animation: toastIn 0.25s ease; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+        pre.json-preview {
+            background: #020617;
+            border: 1px solid #1e293b;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            font-size: 0.72rem;
+            line-height: 1.5;
+            overflow: auto;
+            max-height: 16rem;
+            color: #a5f3fc;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-red-600 to-red-800 shadow-lg shadow-red-900/40">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight">AMD.AI Dashboard</h1>
+                        <p class="text-xs text-slate-400">LLMs locales en AMD · puerto 9090</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="hidden sm:inline-flex items-center gap-2 text-xs text-slate-300 bg-slate-800/80 border border-slate-700 rounded-full px-3 py-1.5">
+                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <span id="backend-status">Verificando backends...</span>
+                    </span>
+                </div>
+            </div>
+            <!-- Tabs: conmutación 100% local, sin Alpine ni navegación -->
+            <nav class="border-t border-slate-800/60" role="tablist" aria-label="Secciones">
+                <div class="max-w-7xl mx-auto px-4 py-3 flex gap-2 overflow-x-auto" id="main-tabs">
+                    <button type="button" role="tab" data-tab="inicio" class="seg-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/80 text-slate-200" aria-selected="true">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        Inicio
+                    </button>
+                    <button type="button" role="tab" data-tab="models" class="seg-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/80 text-slate-200" aria-selected="false">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v12M4 7l16 8"></path></svg>
+                        Modelos
+                    </button>
+                    <button type="button" role="tab" data-tab="benchmark" class="seg-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/80 text-slate-200" aria-selected="false">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Benchmark
+                    </button>
+                    <button type="button" role="tab" data-tab="tuning" class="seg-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/80 text-slate-200" aria-selected="false">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Tuning
+                    </button>
+                    <button type="button" role="tab" data-tab="launch" class="seg-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/80 text-slate-200" aria-selected="false">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Lanzar
+                    </button>
+                    <button type="button" role="tab" data-tab="updates" class="seg-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/80 text-slate-200" aria-selected="false">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Updates
+                    </button>
+                    <button type="button" role="tab" data-tab="blog" class="seg-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/80 text-slate-200" aria-selected="false">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Blog
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main -->
+        <main class="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+            <div id="panel-inicio" class="tab-panel">
+            {% block content %}{% endblock %}
+            </div>
+            <div id="panel-models" class="tab-panel" style="display:none" hx-get="/partials/models_tab.html?v=10" hx-trigger="load" hx-swap="innerHTML">
+                <p class="text-slate-400">Cargando modelos...</p>
+            </div>
+            <div id="panel-benchmark" class="tab-panel" style="display:none" hx-get="/partials/benchmark_tab.html?v=10" hx-trigger="load" hx-swap="innerHTML"></div>
+            <div id="panel-tuning" class="tab-panel" style="display:none" hx-get="/partials/tuning_tab.html?v=10" hx-trigger="load" hx-swap="innerHTML"></div>
+            <div id="panel-launch" class="tab-panel" style="display:none" hx-get="/partials/launch_tab.html?v=10" hx-trigger="load" hx-swap="innerHTML"></div>
+            <div id="panel-updates" class="tab-panel" style="display:none" hx-get="/partials/updates_tab.html?v=10" hx-trigger="load" hx-swap="innerHTML"></div>
+            <div id="panel-blog" class="tab-panel" style="display:none" hx-get="/partials/blog_tab.html?v=10" hx-trigger="load" hx-swap="innerHTML"></div>
+        </main>
+
+        <footer class="border-t border-slate-800/60 py-4">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+                <span>AMD.AI Dashboard v1.0 · Skill <span class="font-mono">local-ai-use</span> · puerto 9090</span>
+                <span>Detectar &rarr; Benchmark &rarr; Tuning &rarr; Analizar &rarr; Lanzar</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Barra de errores JS (diagnóstico visible) -->
+    <div id="js-error-bar" style="display:none" class="fixed top-2 left-1/2 -translate-x-1/2 z-50 max-w-3xl w-[92%] bg-red-700 text-white text-xs rounded-lg px-4 py-2 shadow-xl cursor-pointer" title="Clic para ocultar">
+        <strong>Error JS:</strong> <span></span>
+    </div>
+
+    <!-- Toasts -->
+    <div class="fixed bottom-4 right-4 z-50 space-y-2 w-80" id="toast-container"></div>
+
+    <script>
+    (function () {
+        'use strict';
+        var TABS = ['inicio', 'models', 'benchmark', 'tuning', 'launch', 'updates', 'blog'];
+
+        function show(name) {
+            if (TABS.indexOf(name) < 0) name = 'inicio';
+            TABS.forEach(function (t) {
+                var p = document.getElementById('panel-' + t);
+                if (p) p.style.display = (t === name) ? '' : 'none';
+            });
+            var btns = document.querySelectorAll('#main-tabs [data-tab]');
+            for (var i = 0; i < btns.length; i++) {
+                (function (b) {
+                    var on = b.getAttribute('data-tab') === name;
+                    if (on) b.classList.add('active'); else b.classList.remove('active');
+                    b.setAttribute('aria-selected', on ? 'true' : 'false');
+                })(btns[i]);
+            }
+            try { localStorage.setItem('amd_tab', name); } catch (e) {}
+        }
+
+        function showToast(message, type) {
+            var box = document.getElementById('toast-container');
+            if (!box) return;
+            var el = document.createElement('div');
+            el.className = 'toast-in p-4 rounded-xl shadow-xl text-white text-sm ' +
+                (type === 'error' ? 'bg-red-600' : (type === 'success' ? 'bg-green-600' : 'bg-blue-600'));
+            el.textContent = message;
+            box.appendChild(el);
+            setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 5000);
+        }
+        window.AMD_toast = showToast;
+
+        function bind() {
+            var btns = document.querySelectorAll('#main-tabs [data-tab]');
+            for (var i = 0; i < btns.length; i++) {
+                (function (b) {
+                    b.addEventListener('click', function () {
+                        show(b.getAttribute('data-tab'));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                })(btns[i]);
+            }
+        }
+
+        function backends() {
+            var el = document.getElementById('backend-status');
+            fetch('/api/backends').then(function (r) { return r.json(); }).then(function (d) {
+                var names = (d.backends || []).map(function (b) { return String(b.name).toUpperCase(); }).join(', ');
+                if (el) el.textContent = 'Backends: ' + (names || 'ninguno');
+            }).catch(function () {
+                if (el) el.textContent = 'Backends: error';
+            });
+        }
+
+        window.AMD_showTab = show;
+
+        function showBar(msg) {
+            var bar = document.getElementById('js-error-bar');
+            if (!bar) return;
+            bar.style.display = 'block';
+            var s = bar.querySelector('span');
+            if (s) s.textContent = String(msg).slice(0, 300);
+        }
+        var _bar = document.getElementById('js-error-bar');
+        if (_bar) _bar.addEventListener('click', function () { _bar.style.display = 'none'; });
+        window.addEventListener('error', function (ev) {
+            if (!ev) return;
+            var msg = ev.message || '';
+            var src = ev.filename ? (' (' + String(ev.filename).split('/').pop() + (ev.lineno ? ':' + ev.lineno : '') + ')') : '';
+            if (msg && msg !== 'Script error.') {
+                showBar(msg + src + ' — pulsa F12 para más detalle');
+            } else if (msg === 'Script error.') {
+                diagnoseCdn();
+            }
+        });
+        function diagnoseCdn() {
+            var missing = [];
+            try {
+                if (!window.htmx) missing.push('HTMX (unpkg)');
+                if (!window.Alpine) missing.push('Alpine.js (jsdelivr)');
+                if (!window.hljs) missing.push('highlight.js (cdnjs)');
+            } catch (e) {}
+            if (missing.length) {
+                showBar('No se pudo cargar: ' + missing.join(', ') + '. Revisa tu conexión o desactiva el bloqueador. Pulsa F12 para más detalle');
+            }
+        }
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                var bar = document.getElementById('js-error-bar');
+                if (bar && bar.style.display !== 'block') diagnoseCdnSilent();
+            }, 4000);
+        });
+        function diagnoseCdnSilent() {
+            var missing = [];
+            try {
+                if (!window.htmx) missing.push('HTMX');
+                if (!window.Alpine) missing.push('Alpine.js');
+            } catch (e) {}
+            if (missing.length) showBar('Sin cargar: ' + missing.join(', ') + ' (CDN). Las pestañas funcionan, pero el contenido dinámico puede fallar.');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () { bind(); backends(); });
+        } else {
+            bind();
+            backends();
+        }
+        var initial = 'inicio';
+        try { initial = localStorage.getItem('amd_tab') || 'inicio'; } catch (e) {}
+        show(initial);
+    })();
+    </script>
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<div class="card p-6 rounded-lg" x-data="{ model: '', backend: 'hip', profile: 'balanced', quick: true, repetitions: 2, job: null, status: null, models: [], elapsed: 0, timer: null, summary: null, top: [], showDone: false, msg: '' }">
+    <h2 class="text-xl font-bold mb-4">Auto-Tuning</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+        <select x-model="model" class="p-2 rounded bg-slate-800 border border-slate-600" x-init="fetch('/api/models').then(r => r.json()).then(d => { models = d.models || []; if (models.length && !model) model = models[0].name; })">
+            <option value="">-- Selecciona modelo --</option>
+            <template x-for="m in models" :key="m.path">
+                <option :value="m.name" x-text="m.name + ' (' + (m.size_gb || '?') + ' GB)'"></option>
+            </template>
+        </select>
+        <select x-model="backend" class="p-2 rounded bg-slate-800 border border-slate-600">
+            <option value="hip">hip</option>
+            <option value="vulkan">vulkan</option>
+            <option value="both">both</option>
+        </select>
+        <select x-model="profile" class="p-2 rounded bg-slate-800 border border-slate-600">
+            <option value="balanced">balanced</option>
+            <option value="latency">latency</option>
+            <option value="throughput">throughput</option>
+            <option value="max_context">max_context</option>
+            <option value="memory_efficient">memory_efficient</option>
+        </select>
+        <input x-model.number="repetitions" type="number" min="1" max="5" class="p-2 rounded bg-slate-800 border border-slate-600">
+    </div>
+    <label class="text-sm text-slate-300"><input type="checkbox" x-model="quick"> quick</label>
+    <div class="mt-3">
+        <button class="bg-blue-600 px-4 py-2 rounded" @click="
+            msg = ''; if (!model) { msg = 'Error: selecciona un modelo primero'; } else { fetch('/api/tune/start', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({model, backend, profile, quick, repetitions})}).then(r => r.json().then(d => ({ok: r.ok, body: d}))).then(d => { if (!d.ok || !d.body.job_id) { msg = 'Error: ' + (d.body.detail || 'no se pudo iniciar'); return; } job = d.body; elapsed = 0; summary = null; top = []; status = null; showDone = false; clearInterval(timer); timer = setInterval(() => elapsed++, 1000); const poll = () => fetch('/api/tune/status/' + d.body.job_id).then(r => r.json()).then(s => { status = s; if (s.status === 'running' || s.status === 'queued') setTimeout(poll, 2000); else { clearInterval(timer); fetch('/api/tune/results/' + d.body.job_id).then(r => r.json()).then(j => { status = j; try { const rows = (j && j.result && j.result.rows) || []; top = [...rows].slice(0, 8); summary = (j && j.result && j.result.summary) || null; if (j.status === 'completed') showDone = true; else msg = 'Error: ' + (j.message || j.detail || j.status || 'job no encontrado'); } catch (e) { msg = 'Error: ' + e; } }).catch(e => { msg = 'Error: ' + e; }); } }).catch(e => { msg = 'Error: ' + e; }); poll(); }).catch(e => { msg = 'Error: ' + e; }); }">Iniciar Tuning</button>
+        <p class="mt-2 text-sm" :class="msg.startsWith('Error') ? 'text-red-300' : 'text-green-300'" x-text="msg"></p>
+    </div>
+    <div class="mt-4 p-4 bg-slate-800 rounded">
+        <div class="flex flex-wrap gap-4 text-sm">
+            <p>Job: <span class="font-mono" x-text="job ? job.job_id : '-'"></span></p>
+            <p>Estado: <span x-text="status ? (status.status + ' ' + status.progress + '% ' + (status.message || '')) : 'Esperando...'"></span></p>
+            <p>Tiempo: <span class="font-mono" x-text="Math.floor(elapsed/60) + 'm ' + (elapsed%60) + 's'"></span></p>
+            <p>Perfil: <span class="font-mono" x-text="profile"></span></p>
+        </div>
+        <div class="mt-2 h-2 bg-slate-700 rounded overflow-hidden"><div class="h-full bg-blue-500 transition-all" :style="'width:' + (status ? status.progress : 0) + '%'"></div></div>
+    </div>
+    <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3" x-show="summary && summary.best && summary.best.score !== undefined">
+        <div class="p-3 bg-slate-800 rounded"><p class="text-xs text-slate-400">Mejor score</p><p class="text-xl font-bold text-green-400" x-text="summary?.best?.score ?? '-'"></p></div>
+        <div class="p-3 bg-slate-800 rounded"><p class="text-xs text-slate-400">Decode</p><p class="text-xl font-bold text-blue-400"><span x-text="summary?.best?.metrics?.decode_tok_s ?? '-'"></span> <span class="text-xs">tok/s</span></p></div>
+        <div class="p-3 bg-slate-800 rounded"><p class="text-xs text-slate-400">Prefill</p><p class="text-xl font-bold text-purple-400"><span x-text="summary?.best?.metrics?.prefill_tok_s ?? '-'"></span> <span class="text-xs">tok/s</span></p></div>
+        <div class="p-3 bg-slate-800 rounded"><p class="text-xs text-slate-400">Configs OK</p><p class="text-xl font-bold" x-text="(summary?.ok ?? '-') + '/' + (summary?.total ?? '-')"></p></div>
+    </div>
+    <div class="mt-4" x-show="top.length">
+        <h3 class="font-bold mb-2">Ranking por score</h3>
+        <table class="w-full text-sm">
+            <thead><tr class="text-left text-slate-400"><th class="p-2">score</th><th class="p-2">backend</th><th class="p-2">ngl</th><th class="p-2">batch</th><th class="p-2">cache</th><th class="p-2">decode tok/s</th><th class="p-2">prefill tok/s</th></tr></thead>
+            <tbody>
+                <template x-for="r in top" :key="(r.timestamp || '') + (r.config ? r.config.batch_size : '') + r.score">
+                    <tr class="border-t border-slate-700">
+                        <td class="p-2 font-mono text-green-400" x-text="typeof r.score === 'number' ? r.score.toFixed(1) : r.score"></td>
+                        <td class="p-2 font-mono" x-text="r.backend"></td>
+                        <td class="p-2 font-mono" x-text="r.config ? r.config.n_gpu_layers : '-'"></td>
+                        <td class="p-2 font-mono" x-text="r.config ? r.config.batch_size : '-'"></td>
+                        <td class="p-2 font-mono" x-text="r.config ? r.config.cache_type : '-'"></td>
+                        <td class="p-2 font-mono text-blue-400" x-text="r.decode_tok_s"></td>
+                        <td class="p-2 font-mono text-purple-400" x-text="r.prefill_tok_s"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <div x-show="showDone" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" @click.self="showDone = false">
+        <div class="card p-6 max-w-lg w-full">
+            <h3 class="text-xl font-bold text-green-400 mb-2">Tuning completado</h3>
+            <p class="text-sm text-slate-300 mb-4" x-text="model + ' (' + profile + ') · ' + Math.floor(elapsed/60) + 'm ' + (elapsed%60) + 's'"></p>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="p-3 bg-slate-800 rounded"><p class="text-xs text-slate-400">Mejor score</p><p class="text-xl font-bold text-green-400" x-text="summary?.best?.score ?? '-'"></p></div>
+                <div class="p-3 bg-slate-800 rounded"><p class="text-xs text-slate-400">Decode</p><p class="text-xl font-bold text-blue-400"><span x-text="summary?.best?.metrics?.decode_tok_s ?? '-'"></span> <span class="text-xs">tok/s</span></p></div>
+            </div>
+            <div class="flex gap-2">
+                <button class="bg-slate-700 px-4 py-2 rounded" @click="showDone = false">Cerrar</button>
+                <button class="bg-purple-600 px-4 py-2 rounded" @click="showDone = false; window.AMD_showTab && window.AMD_showTab('launch'); window.scrollTo({top: 0, behavior: 'smooth'})">Ir a Lanzar .bat</button>
+            </div>
+        </div>
+    </div>
+    <div class="card p-4 mt-4" x-data="{ evts: [] }" x-init="fetch('/api/events?limit=5&amp;prefix=tuning.').then(r => r.json()).then(d => { evts = d.events || []; }).catch(() => { evts = []; })">
+        <h3 class="font-bold mb-2 text-sm">Actividad reciente: tuning</h3>
+        <ul class="space-y-1">
+            <template x-for="e in evts" :key="(e.timestamp || '') + (e.event_type || '')">
+                <li class="text-xs font-mono text-slate-300 truncate"><span class="text-cyan-300" x-text="e.event_type"></span> <span class="text-slate-500" x-text="(e.timestamp || '').slice(0, 19).replace('T', ' ')"></span></li>
+            </template>
+        </ul>
+        <p class="text-xs text-slate-500" x-show="!evts.length">Sin actividad de este tipo todavía.</p>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="card p-6 rounded-lg" x-data="{ models: [], count: 0, loading: false }">
+    <h2 class="text-xl font-bold mb-4">Modelos Disponibles</h2>
+    <div class="flex gap-2 mb-4">
+        <button class="bg-blue-600 px-4 py-2 rounded" @click="loading = true; fetch('/api/models/scan', {method: 'POST'}).then(r => r.json()).then(d => { count = d.count; return fetch('/api/models'); }).then(r => r.json()).then(d => { models = d.models; count = d.count; loading = false; }).catch(() => { loading = false; })">Escanear ahora</button>
+        <button class="bg-slate-700 px-4 py-2 rounded" @click="fetch('/api/models').then(r => r.json()).then(d => { models = d.models; count = d.count; })">Recargar</button>
+        <span class="text-slate-400 self-center" x-text="loading ? 'Escaneando...' : count + ' modelos'"></span>
+    </div>
+    <div x-init="fetch('/api/models').then(r => r.json()).then(d => { models = d.models; count = d.count; })"></div>
+    <table class="w-full text-sm">
+        <thead><tr class="text-left text-slate-400"><th class="p-2">Nombre</th><th class="p-2">Tamano</th><th class="p-2">Cuantizacion</th><th class="p-2">Extra</th><th class="p-2">Ruta</th></tr></thead>
+        <tbody>
+            <template x-for="m in models" :key="m.path">
+                <tr class="border-t border-slate-700">
+                    <td class="p-2 font-mono" x-text="m.name"></td>
+                    <td class="p-2" x-text="(m.size_gb || '?') + ' GB'"></td>
+                    <td class="p-2" x-text="m.quantization"></td>
+                    <td class="p-2 text-xs" x-text="(m.has_mmproj ? 'mmproj ' : '') + (m.has_mtp ? 'mtp' : '')"></td>
+                    <td class="p-2 font-mono text-xs break-all" x-text="m.path"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <div class="card p-4 mt-4" x-data="{ evts: [] }" x-init="fetch('/api/events?limit=5&amp;prefix=model.').then(r => r.json()).then(d => { evts = d.events || []; }).catch(() => { evts = []; })">
+        <h3 class="font-bold mb-2 text-sm">Actividad reciente: modelos</h3>
+        <ul class="space-y-1">
+            <template x-for="e in evts" :key="(e.timestamp || '') + (e.event_type || '')">
+                <li class="text-xs font-mono text-slate-300 truncate"><span class="text-cyan-300" x-text="e.event_type"></span> <span class="text-slate-500" x-text="(e.timestamp || '').slice(0, 19).replace('T', ' ')"></span></li>
+            </template>
+        </ul>
+        <p class="text-xs text-slate-500" x-show="!evts.length">Sin actividad de este tipo todavía.</p>
+    </div>
+</div>

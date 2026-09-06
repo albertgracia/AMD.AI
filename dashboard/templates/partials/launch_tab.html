@@ -1,0 +1,96 @@
+<div class="card p-6 rounded-lg" x-data="{ model: '', preset: 'balanced', backend: 'hip', vision: 'auto', mtp: 'auto', host: '127.0.0.1', port: 8080, bat: '', saved: '', detected: null, models: [], launched: null, servers: [], msg: '', refreshServers() { fetch('/api/servers').then(r => r.json()).then(d => this.servers = d.servers || []); }, touch() { bat = ''; saved = ''; launched = null; msg = 'Opciones cambiadas: pulsa Generar de nuevo.'; } }">
+    <h2 class="text-xl font-bold mb-4">Lanzar Script (.bat)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <select x-model="model" class="p-2 rounded bg-slate-800 border border-slate-600" x-init="fetch('/api/models').then(r => r.json()).then(d => { models = d.models || []; if (models.length && !model) { model = models[0].name; detected = models[0]; } })" @change="detected = (models || []).find(x => x.name === model || x.path === model) || null; touch()">
+            <option value="">-- Selecciona modelo --</option>
+            <template x-for="m in models" :key="m.path">
+                <option :value="m.name" x-text="m.name + ' (' + (m.size_gb || '?') + ' GB)'"></option>
+            </template>
+        </select>
+        <select x-model="preset" @change="touch()" class="p-2 rounded bg-slate-800 border border-slate-600">
+            <option value="balanced">balanced</option>
+            <option value="throughput">throughput</option>
+            <option value="latency">latency</option>
+            <option value="max_context">max_context</option>
+            <option value="memory_efficient">memory_efficient</option>
+            <option value="cpu_only">cpu_only</option>
+        </select>
+        <select x-model="backend" @change="touch()" class="p-2 rounded bg-slate-800 border border-slate-600">
+            <option value="hip">hip</option>
+            <option value="vulkan">vulkan</option>
+            <option value="cpu">cpu</option>
+        </select>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <div>
+            <label class="text-sm text-slate-300">Vision (mmproj)</label>
+            <select x-model="vision" @change="touch()" class="p-2 rounded bg-slate-800 border border-slate-600 w-full">
+                <option value="auto">auto (usar si existe)</option>
+                <option value="on">on (forzar)</option>
+                <option value="off">off</option>
+            </select>
+            <p class="text-xs text-slate-400 mt-1" x-text="detected ? (detected.has_mmproj ? 'Detectado: mmproj' : 'Sin mmproj detectado') : 'Escribe un modelo para detectar complementarios'"></p>
+        </div>
+        <div>
+            <label class="text-sm text-slate-300">MTP (speculative draft-mtp)</label>
+            <select x-model="mtp" @change="touch()" class="p-2 rounded bg-slate-800 border border-slate-600 w-full">
+                <option value="auto">auto (usar si existe)</option>
+                <option value="on">on (forzar)</option>
+                <option value="off">off</option>
+            </select>
+            <p class="text-xs text-slate-400 mt-1" x-text="detected ? (detected.has_mtp ? 'Detectado: drafter MTP' : 'Sin drafter MTP detectado') : 'Escribe un modelo para detectar complementarios'"></p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <div>
+            <label class="text-sm text-slate-300">Exponer en</label>
+            <select x-model="host" @change="touch()" class="p-2 rounded bg-slate-800 border border-slate-600 w-full">
+                <option value="127.0.0.1">Solo este PC (127.0.0.1)</option>
+                <option value="0.0.0.0">Toda la red local (0.0.0.0)</option>
+            </select>
+            <p class="text-xs mt-1" :class="host === '0.0.0.0' ? 'text-yellow-300' : 'text-slate-400'" x-text="host === '0.0.0.0' ? 'Atención: accesible desde cualquier equipo de tu red' : 'Solo accesible desde este PC'"></p>
+        </div>
+        <div>
+            <label class="text-sm text-slate-300">Puerto</label>
+            <input x-model.number="port" @change="touch()" type="number" min="1" max="65535" class="p-2 rounded bg-slate-800 border border-slate-600 w-full">
+        </div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <button class="bg-purple-600 px-4 py-2 rounded" @click="msg = ''; if (!model) { msg = 'Error: selecciona un modelo primero'; } else { fetch('/api/launch/generate-bat', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({model, preset, backend, vision, mtp, host, port})}).then(r => r.json().then(d => ({ok: r.ok, body: d}))).then(d => { if (!d.ok) { msg = 'Error: ' + (d.body.detail || 'no se pudo generar'); return; } bat = d.body.bat_content || ''; saved = ''; launched = null; msg = 'Generado. Revísalo abajo y pulsa Guardar.'; }).catch(e => { msg = 'Error: ' + e; }); }">Generar .bat</button>
+        <button class="bg-green-600 px-4 py-2 rounded" @click="msg = ''; if (!bat) { msg = 'Error: genera el .bat primero'; } else { fetch('/api/launch/save-bat', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({filename: 'run_' + model.replace(/[^a-zA-Z0-9]+/g, '_') + '_' + preset + '.bat', content: bat})}).then(r => r.json().then(d => ({ok: r.ok, body: d}))).then(d => { if (!d.ok) { msg = 'Error: ' + (d.body.detail || 'no se pudo guardar'); return; } saved = d.body.path; msg = 'Guardado en: ' + d.body.path; }).catch(e => { msg = 'Error: ' + e; }); }">Guardar .bat</button>
+        <button class="bg-red-600 px-4 py-2 rounded" @click="msg = ''; if (!saved) { msg = 'Error: guarda el .bat primero (botón Guardar)'; } else { fetch('/api/launch/launch', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({path: saved, port: port})}).then(r => r.json().then(d => ({ok: r.ok, body: d}))).then(d => { if (!d.ok) { msg = 'Error al lanzar: ' + (d.body.detail || 'desconocido'); return; } launched = d.body; refreshServers(); msg = 'Lanzado (PID ' + d.body.pid + ') en ' + d.body.url; }).catch(e => { msg = 'Error: ' + e; }); }">Lanzar .bat</button>
+        <button class="bg-slate-700 px-4 py-2 rounded" @click="refreshServers()">Ver servidores</button>
+    </div>
+    <p class="mt-2 text-sm" :class="msg.startsWith('Error') ? 'text-red-300' : 'text-green-300'" x-text="msg"></p>
+    <div class="mt-4" x-show="launched">
+        <p class="text-sm text-green-300">Servidor lanzado: <a class="underline font-mono" :href="(launched || {}).url" target="_blank" x-text="(launched || {}).url"></a> <span class="text-slate-400 font-mono" x-text="'(PID ' + (launched || {}).pid + ')'"></span></p>
+    </div>
+    <div class="mt-4" x-show="servers.length">
+        <h3 class="font-bold mb-2">Servidores lanzados desde el dashboard</h3>
+        <table class="w-full text-sm">
+            <thead><tr class="text-left text-slate-400"><th class="p-2">ID</th><th class="p-2">PID</th><th class="p-2">URL</th><th class="p-2">Estado</th><th class="p-2"></th></tr></thead>
+            <tbody>
+                <template x-for="s in servers" :key="s.id">
+                    <tr class="border-t border-slate-700">
+                        <td class="p-2 font-mono" x-text="s.id"></td>
+                        <td class="p-2 font-mono" x-text="s.pid"></td>
+                        <td class="p-2 font-mono" x-text="s.url"></td>
+                        <td class="p-2" x-text="s.status"></td>
+                        <td class="p-2"><button class="bg-red-700 px-3 py-1 rounded text-xs" @click="fetch('/api/servers/stop', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({server_id: s.id})}).then(() => refreshServers())">Parar</button></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <p class="mt-2 text-sm text-slate-400" x-text="saved ? ('Guardado en: ' + saved) : ''"></p>
+    <pre class="mt-4 p-4 bg-slate-800 rounded text-xs overflow-auto max-h-96" x-text="bat || 'Esperando... Area de vista previa del .bat generado.'"></pre>
+    <div class="card p-4 mt-4" x-data="{ evts: [] }" x-init="fetch('/api/events?limit=5&amp;prefix=bat.,launch.').then(r => r.json()).then(d => { evts = d.events || []; }).catch(() => { evts = []; })">
+        <h3 class="font-bold mb-2 text-sm">Actividad reciente: lanzamientos</h3>
+        <ul class="space-y-1">
+            <template x-for="e in evts" :key="(e.timestamp || '') + (e.event_type || '')">
+                <li class="text-xs font-mono text-slate-300 truncate"><span class="text-cyan-300" x-text="e.event_type"></span> <span class="text-slate-500" x-text="(e.timestamp || '').slice(0, 19).replace('T', ' ')"></span></li>
+            </template>
+        </ul>
+        <p class="text-xs text-slate-500" x-show="!evts.length">Sin actividad de este tipo todavía.</p>
+    </div>
+</div>

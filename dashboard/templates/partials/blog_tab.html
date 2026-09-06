@@ -1,0 +1,32 @@
+<div class="card p-6 rounded-lg" x-data="{ drafts: [], selected: null, content: '' }">
+    <h2 class="text-xl font-bold mb-2">Blog Astro <span class="text-xs font-normal text-yellow-300 border border-yellow-500/40 rounded px-2 py-0.5 ml-2">EN PREPARACIÓN</span></h2>
+    <p class="text-sm text-slate-400 mb-4">Aquí irán la previsualización, edición y publicación al blog Astro. De momento puedes ver los borradores que el dashboard genera solo con cada benchmark, tuning y análisis.</p>
+    <div class="flex gap-2 mb-4">
+        <button class="bg-slate-700 px-4 py-2 rounded" @click="fetch('/api/blog/drafts').then(r => r.json()).then(d => drafts = d.drafts || [])">Recargar borradores</button>
+    </div>
+    <div x-init="fetch('/api/blog/drafts').then(r => r.json()).then(d => drafts = d.drafts || [])"></div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-1">
+            <template x-for="d in drafts" :key="d.filename">
+                <button class="block w-full text-left p-3 mb-2 rounded bg-slate-800 hover:bg-slate-700" @click="fetch('/api/blog/draft/' + encodeURIComponent(d.filename)).then(r => r.json()).then(x => { selected = d.filename; content = x.content; })">
+                    <p class="font-mono text-sm truncate" x-text="d.filename"></p>
+                    <p class="text-xs text-slate-500" x-text="(d.modified || '').slice(0, 19).replace('T', ' ') + ' · ' + d.size + ' B'"></p>
+                </button>
+            </template>
+            <p class="text-sm text-slate-500" x-show="!drafts.length">Aún no hay borradores. Completa un benchmark o tuning para generar el primero.</p>
+        </div>
+        <div class="md:col-span-2">
+            <p class="text-sm text-slate-400 mb-2" x-text="selected ? ('Vista previa: ' + selected) : 'Selecciona un borrador'"></p>
+            <pre class="p-4 bg-slate-950 border border-slate-700 rounded text-xs overflow-auto max-h-96" x-text="content || '...'"></pre>
+        </div>
+    </div>
+    <div class="card p-4 mt-4" x-data="{ evts: [] }" x-init="fetch('/api/events?limit=5&amp;prefix=blog.').then(r => r.json()).then(d => { evts = d.events || []; }).catch(() => { evts = []; })">
+        <h3 class="font-bold mb-2 text-sm">Actividad reciente: blog</h3>
+        <ul class="space-y-1">
+            <template x-for="e in evts" :key="(e.timestamp || '') + (e.event_type || '')">
+                <li class="text-xs font-mono text-slate-300 truncate"><span class="text-cyan-300" x-text="e.event_type"></span> <span class="text-slate-500" x-text="(e.timestamp || '').slice(0, 19).replace('T', ' ')"></span></li>
+            </template>
+        </ul>
+        <p class="text-xs text-slate-500" x-show="!evts.length">Sin actividad de este tipo todavía.</p>
+    </div>
+</div>
