@@ -1,4 +1,5 @@
 ﻿"""Launch router — generacion, guardado y lanzamiento de .bat."""
+import os
 import subprocess as _sp
 import uuid as _uuid
 from datetime import datetime
@@ -14,6 +15,7 @@ router = APIRouter()
 
 # Referencias a estado compartido
 GENERATED_BATS_DIR = None
+MODELS_DIR = None
 servers: Dict[str, Dict[str, Any]] = {}
 jobs: Dict[str, Dict[str, Any]] = {}
 ws_connections: Dict[str, list] = {}
@@ -128,14 +130,15 @@ async def generate_bat(request: Request):
     if not model:
         raise HTTPException(status_code=400, detail="Falta 'model'")
     from utils import model_scanner
+    models_dir = str(MODELS_DIR) if MODELS_DIR else str(Path(__file__).parent.parent.parent / "models")
     info = None
-    for m in model_scanner.scan_models(str(model_scanner.BASE_DIR.parent / "models")):
+    for m in model_scanner.scan_models(models_dir):
         if m.get("name") == model or m.get("path") == model:
             info = m
             break
     if not info:
         lowered = model.lower()
-        for m in model_scanner.scan_models(str(model_scanner.BASE_DIR.parent / "models")):
+        for m in model_scanner.scan_models(models_dir):
             if lowered in str(m.get("name", "")).lower():
                 info = m
                 break

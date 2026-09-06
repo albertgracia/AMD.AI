@@ -34,7 +34,7 @@ LLAMA_CPP_PATHS = {
         r"G:\llama.cpp\bin\llama-b10796-bin-win-vulkan-x64",
     ],
     "hip_build": r"G:\llama.cpp-src\build-hip\bin",
-    "gguf_models": r"G:\llama.cpp\gguf",
+    "gguf_models": r"G:\Proyectos\AMD.AI\models",
     "presets_file": r"G:\llama.cpp\presets.ini",
 }
 

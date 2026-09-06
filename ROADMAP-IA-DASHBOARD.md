@@ -102,6 +102,15 @@
 
 ### FASE 3: Dashboard Avanzado (Bajo Demanda)
 
+- [x] **P3-#1: Expandir Tab Launch con parámetros avanzados** (2026-09-06)
+  - Soporte para threads, threads-batch, n-cpu-moe
+  - Soporte para temp, top-p, top-k, min-p, penalties
+  - Soporte para MTP draft configurables (spec-draft-n-max, spec-draft-n-min, spec-draft-p-min)
+  - Soporte para reasoning-preserve, jinja, tools, mcp-servers-config
+  - Soporte para cache-type-k-draft, cache-type-v-draft, cache-idle-slots
+  - Soporte para load-mode, parallel, image-min-tokens
+  - UI con secciones colapsables: Básico, Avanzado, MTP Draft, Razonamiento, Tools/MCP
+  - Preview en tiempo real del .bat generado
 - [ ] Analisis visual: Iframe chrome://tracing, graficos Plotly escalabilidad
 - [ ] Historial runs: Tabla paginada, filtros, export
 - [ ] Comparativas visuales: Heatmaps, side-by-side Vulkan/HIP/CPU
@@ -249,9 +258,10 @@ python -c "import sys; sys.path.append(r'G:\Proyectos\AMD.AI\skills\local-ai-use
 > 1. Lee `AGENTS.md` (instrucciones proyecto)
 > 2. Lee `ROADMAP-IA-DASHBOARD.md` (este archivo)
 > 3. Verifica estado actual en checkboxes arriba
-> 4. Continua desde Paso 1: Setup Base (primer `[ ]` sin marcar)
-> 5. Ejecuta comandos de "Proximos Comandos a Ejecutar"
-> 6. Actualiza este archivo tras cada paso completado
+> 4. **PROXIMO PASO:** P3-#1 (expandir Tab Launch con parámetros avanzados)
+> 5. Albert hizo pruebas funcionales esta noche (2026-09-06) — verificar resultados
+> 6. Ejecutar comandos de "Proximos Comandos a Ejecutar" si es necesario
+> 7. Actualizar este archivo tras cada paso completado
 
 ---
 
@@ -285,10 +295,11 @@ python -c "import sys; sys.path.append(r'G:\Proyectos\AMD.AI\skills\local-ai-use
 | 2026-09-06 | Parche P1-#4: ZIP extraction validation (PurePosixPath, sanitizacion, bloqueo parent/absolutas) | IA |
 | 2026-09-06 | Parche P2-#6: Split main.py en routers modulares (benchmark, tuning, launch, llama, events, blog) | IA |
 | 2026-09-06 | Backup completo: `G:\Proyectos\AMD.AI.backup.20260906` | IA |
+| 2026-09-06 | Roadmap: P3-#1 anadido (expandir Tab Launch con 25+ parámetros avanzados) | IA |
 
 ---
 
-**PROXIMO PASO:** P4 (CORS/Auth/api-key/firewall) + repo Astro en blog-cloudflare-astro/
+**PROXIMO PASO:** P3-#1 (expandir Tab Launch con parámetros avanzados) + pruebas funcionales esta noche
 
 ## Nota modelos 2026-09-06
 - `models/` usa una carpeta por modelo con complementarios: `gemma-4-12B-it-qat-UD-Q4_K_XL.gguf` + `mmproj-BF16.gguf` (vision) + `mtp-gemma-4-12B-it.gguf` (drafter MTP).

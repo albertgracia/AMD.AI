@@ -1,6 +1,7 @@
 ﻿"""Tuning router â€” endpoints y jobs de auto-tuning."""
 import asyncio
 import json
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
@@ -77,7 +78,8 @@ async def _run_tuning_job(job_id: str, model: str, backend: str, profile: str, q
         out_json = str(DATA_DIR / f"tune_{safe_model}_{profile}_{job_id}.json")
         _info = _find_model(model)
         _marg = _info["path"] if _info else model
-        params: Dict[str, Any] = {"model": _marg, "backend": backend, "profile": profile, "repetitions": repetitions, "output": out_json}
+        _model_name = _info["name"] if _info else model
+        params: Dict[str, Any] = {"model": _model_name, "backend": backend, "profile": profile, "repetitions": repetitions, "output": out_json}
         if quick:
             params["quick"] = True
         loop = asyncio.get_event_loop()
