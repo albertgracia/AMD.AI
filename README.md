@@ -6,13 +6,13 @@
 
 **Nombre:** AMD.AI  
 **Ubicación:** `G:\Proyectos\AMD.AI\`  
-**Fecha de análisis:** 2026-09-05  
-**Estado:** En progreso - MVP Dashboard en desarrollo
+**Fecha de análisis:** 2026-09-06  
+**Estado:** MVP Dashboard funcional - Routers modulares implementados
 
 ### Propósito Principal
 Proyecto dual enfocado en:
 1. **Skill `local-ai-use`** (✅ COMPLETADO) - Catálogo oficial AMD para ejecutar/optimizar LLMs locales en hardware AMD
-2. **Dashboard IA** (🟡 EN PROGRESO) - Interfaz web para gestionar modelos, benchmarks, auto-tuning y generación de scripts optimizados
+2. **Dashboard IA** (🟢 FUNCIONAL) - Interfaz web para gestionar modelos, benchmarks, auto-tuning y generación de scripts optimizados
 
 ### Hardware Objetivo
 - **GPU:** AMD Radeon RX 9070 16GB (RDNA 4 / gfx1103 Vulkan, gfx1201 HIP)
@@ -27,9 +27,12 @@ Proyecto dual enfocado en:
 G:\Proyectos\AMD.AI\
 ├── AGENTS.md                              # Instrucciones para agentes IA
 ├── ROADMAP-IA-DASHBOARD.md                # Plan de desarrollo (FASES 0-3)
-├── dashboard/                             # Dashboard web en desarrollo
-│   ├── main.py                            # FastAPI backend (puerto 9090)
+├── INFORME DETALLADO-Proyecto AMD.md      # Este archivo
+├── run_dashboard.py                       # Lanzador delgado (entrypoint)
+├── dashboard/                             # Dashboard web funcional
+│   ├── main.py                            # FastAPI backend (puerto 9090) - ~90 líneas
 │   ├── requirements.txt                   # Dependencias Python
+│   ├── config.py                          # Configuración centralizada (env vars)
 │   ├── static/
 │   │   └── app.js                         # Alpine.js components
 │   ├── templates/
@@ -38,24 +41,31 @@ G:\Proyectos\AMD.AI\
 │   │       ├── models_tab.html            # Tab gestión modelos
 │   │       ├── benchmark_tab.html         # Tab benchmarks
 │   │       ├── tuning_tab.html            # Tab auto-tuning
-│   │       └── launch_tab.html            # Tab generar .bat
+│   │       ├── launch_tab.html            # Tab generar .bat
+│   │       ├── blog_tab.html              # Tab blog drafts
+│   │       └── updates_tab.html           # Tab actualizaciones
 │   ├── utils/
-│   │   ├── model_scanner.py               # Escaneo GGUF (pendiente)
+│   │   ├── model_scanner.py               # Escaneo GGUF (funcional)
 │   │   ├── script_runner.py               # Executor subprocess
-│   │   ├── event_logger.py                # Event sourcing (pendiente)
-│   │   └── blog_generator.py              # Astro drafts (pendiente)
+│   │   ├── event_logger.py                # Event sourcing (funcional)
+│   │   └── blog_generator.py              # Astro drafts (funcional)
+│   ├── routers/                           # 🆕 Routers modulares (P2-#6)
+│   │   ├── __init__.py                    # Paquete routers
+│   │   ├── benchmark.py                   # Endpoints benchmark
+│   │   ├── tuning.py                      # Endpoints auto-tuning
+│   │   ├── launch.py                      # Endpoints launch
+│   │   ├── llama.py                       # Endpoints updates/rebuild
+│   │   ├── events.py                      # Endpoints events
+│   │   └── blog.py                        # Endpoints blog
 │   └── data/
-│       ├── events.jsonl                   # Event store (pendiente)
-│       └── blog_drafts/                   # Drafts Astro (pendiente)
+│       ├── events.jsonl                   # Event store (rotación 5000 líneas)
+│       └── blog_drafts/                   # Drafts Astro (12 drafts)
 ├── docs/                                  # Documentación generada
 │   ├── ENTORNO_RX9070_LLAMA_CPP.md        # Documentación entorno
 │   ├── BENCHMARK_RESULTS_QWEN3.5-9B.md    # Benchmarks Qwen3.5-9B
 │   ├── ANALYSIS_RESULTS.md                # Análisis profundo
 │   ├── AUTO_TUNING_RESULTS.md             # Resultados auto-tuning
 │   ├── IMPLEMENTATION_SUMMARY.md          # Resumen skill
-│   ├── BENCHMARK_RESULTS_QWEN3.5-9B.md    # Detalles benchmarks
-│   ├── tune_*.json                        # Configuraciones tuning
-│   ├── analyze_*.json                     # Resultados análisis
 │   └── traces/                            # Chrome Trace + Prometheus
 ├── skills/
 │   └── local-ai-use/                      # ✅ Skill COMPLETADO
@@ -80,11 +90,7 @@ G:\Proyectos\AMD.AI\
 │   ├── bench_local.py
 │   ├── detect_local.py
 │   └── tune_local.py
-├── AGENTS.md                              # (duplicado)
-├── encoding_check.txt                     # Verificación encoding
-├── fix_indent.py                          # Utilidad indentación
-├── *.url                                  # Enlaces a documentación AMD
-└── skills/local-ai-use/evals/regression_tests.py
+└── AGENTS.md                              # (duplicado)
 ```
 
 ---
@@ -115,38 +121,36 @@ G:\Proyectos\AMD.AI\
 - **gpu_presets.json**: Presets para RX 9070, RX 7900 XTX, MI300X, Ryzen AI, EPYC
 - **quantization_guide.json**: 18 niveles de cuantización con factores VRAM
 
-### 3.2 Dashboard IA (🟡 EN PROGRESO - MVP)
+### 3.2 Dashboard IA (🟢 FUNCIONAL - MVP)
 
 #### Stack Tecnológico
 | Capa | Tecnología | Estado |
 |------|------------|--------|
-| Backend | FastAPI 0.115 + Uvicorn | ✅ main.py creado |
-| Frontend | HTMX 2.0 + Alpine.js 3.14 + Tailwind CDN | ✅ Templates creados |
-| WebSocket | `websockets` lib | ⏳ Pendiente |
-| Event Store | JSONL append-only | ⏳ Pendiente |
-| Blog Drafts | Markdown + YAML Frontmatter | ⏳ Pendiente |
+| Backend | FastAPI 0.115 + Uvicorn | ✅ main.py modularizado (~90 líneas) |
+| Frontend | HTMX 2.0 + Alpine.js 3.14 + Tailwind CDN | ✅ 6 templates creados |
+| WebSocket | `websockets` lib | ✅ Implementado |
+| Event Store | JSONL append-only | ✅ Funcional (rotación 5000 líneas) |
+| Blog Drafts | Markdown + YAML Frontmatter | ✅ Funcional (12 drafts) |
+| Routers | APIRouter modular | ✅ 6 routers creados (P2-#6) |
 
-#### Endpoints Planificados
-| Endpoint | Método | Descripción |
-|----------|--------|-------------|
-| `/` | GET | Home con tabs HTMX |
-| `/health` | GET | Health check |
-| `/api/models` | GET | Lista modelos escaneados |
-| `/api/models/scan` | POST | Escaneo GGUF recursivo |
-| `/api/backends` | GET | Status backends (HIP/Vulkan/CPU) |
-| `/api/benchmark/start` | POST | Iniciar benchmark (background) |
-| `/api/benchmark/status/{job_id}` | GET | Polling progreso |
-| `/api/benchmark/results/{job_id}` | GET | Resultados JSON/CSV |
-| `/api/tune/start` | POST | Iniciar auto-tuning |
-| `/api/tune/results/{job_id}` | GET | Resultados tuning |
-| `/api/launch/generate` | POST | Generar .bat optimizado |
-| `/ws/progress/{job_id}` | WebSocket | Notificaciones tiempo real |
+#### Endpoints Verificados (2026-09-06)
+| Endpoint | Método | Descripción | Estado |
+|----------|--------|-------------|--------|
+| `/` | GET | Home con tabs HTMX | ✅ |
+| `/health` | GET | Health check | ✅ `{"status":"ok"}` |
+| `/api/models` | GET | Lista modelos escaneados | ✅ 2 modelos |
+| `/api/backends` | GET | Status backends (HIP/Vulkan) | ✅ 3 backends |
+| `/api/events` | GET | Historial eventos | ✅ 20 eventos |
+| `/api/blog/drafts` | GET | Listado borradores | ✅ 12 drafts |
+| `/ws/progress/{job_id}` | WebSocket | Notificaciones tiempo real | ✅ |
 
-#### Partial Templates (4 Tabs)
-1. **models_tab.html**: Lista modelos, filtros, selección, export CSV
-2. **benchmark_tab.html**: Formulario benchmark, progreso, resultados
-3. **tuning_tab.html**: Selector perfil, progreso, resultados presets
-4. **launch_tab.html**: Selector modelo/preset, preview .bat, ejecutar
+#### Routers Modulares (NUEVO - P2-#6)
+1. **benchmark.py**: Endpoints y jobs de fondo de benchmarking
+2. **tuning.py**: Endpoints y jobs de auto-tuning
+3. **launch.py**: Generación, guardado, lanzamiento de .bat
+4. **llama.py**: Actualizaciones, rebuild HIP, version checking
+5. **events.py**: Listado de eventos desde el logger
+6. **blog.py**: Listado y lectura de borradores de blog
 
 ---
 
@@ -313,12 +317,10 @@ python skills\local-ai-use\scripts\analyze_local.py --model Qwen3.5-9B --backend
 python skills\local-ai-use\scripts\analyze_local.py --model Qwen3.5-9B --backend hip --trace-chrome --prometheus --yes
 ```
 
-### Dashboard (Cuando Esté Listo)
+### Dashboard (Funcional)
 ```bash
-cd dashboard
-pip install -r requirements.txt
-python main.py                    # Desarrollo
-uvicorn main:app --host 0.0.0.0 --port 9090 --reload  # Producción LAN
+cd G:\Proyectos\AMD.AI
+python run_dashboard.py                    # Lanzador (entrypoint)
 # Acceso: http://localhost:9090 | http://<IP-LAN>:9090
 ```
 
@@ -333,15 +335,21 @@ uvicorn main:app --host 0.0.0.0 --port 9090 --reload  # Producción LAN
 | `bench_local.py` | ✅ VALIDADO | `skills/.../scripts/` | Quick + Full matrix |
 | `tune_local.py` | ✅ VALIDADO | `skills/.../scripts/` | 5 perfiles + presets.ini |
 | `analyze_local.py` | ✅ VALIDADO | `skills/.../scripts/` | Scaling + traces + compare |
-| **Dashboard `main.py`** | ⏳ EN PROGRESO | `dashboard/` | Paso 1-2: Setup base + utils |
-| Model Scanner | ⏳ PENDIENTE | `dashboard/utils/` | Paso 2 |
-| Event Logger | ⏳ PENDIENTE | `dashboard/utils/` | Paso 2 (crítico) |
-| Tab Modelos | ⏳ PENDIENTE | `templates/partials/` | Paso 3 |
-| Tab Benchmark | ⏳ PENDIENTE | `templates/partials/` | Paso 4 |
-| Tab Tuning | ⏳ PENDIENTE | `templates/partials/` | Paso 5 |
-| Tab Launch | ⏳ PENDIENTE | `templates/partials/` | Paso 6 |
-| WebSocket | ⏳ PENDIENTE | `main.py` | Paso 7 |
-| Blog Generator | ⏳ PENDIENTE | `utils/blog_generator.py` | Paso 2 |
+| **Dashboard `main.py`** | ✅ MODULARIZADO | `dashboard/` | Split en routers (P2-#6) |
+| **Routers** | ✅ COMPLETADO | `dashboard/routers/` | 6 routers modulares |
+| Model Scanner | ✅ FUNCIONAL | `dashboard/utils/` | Escaneo GGUF + endpoints |
+| Event Logger | ✅ FUNCIONAL | `dashboard/utils/` | Rotación 5000 líneas, schema unificado |
+| Tab Modelos | ✅ COMPLETADO | `templates/partials/` | Listado, filtros, selección |
+| Tab Benchmark | ✅ COMPLETADO | `templates/partials/` | Formulario, progreso, resultados |
+| Tab Tuning | ✅ COMPLETADO | `templates/partials/` | Selector perfil, progreso, presets |
+| Tab Launch | ✅ COMPLETADO | `templates/partials/` | Generar .bat, preview, ejecutar |
+| Tab Blog | ✅ COMPLETADO | `templates/partials/` | Listado y lectura drafts |
+| Tab Updates | ✅ COMPLETADO | `templates/partials/` | Actualizaciones llama.cpp |
+| WebSocket | ✅ FUNCIONAL | `main.py` | Notificaciones tiempo real |
+| Blog Generator | ✅ FUNCIONAL | `utils/blog_generator.py` | Schema unificado con event_logger |
+| CORS/API Key | ✅ HARDENED | `main.py` | Restringido a localhost + red local |
+| ZIP Validation | ✅ HARDENED | `main.py` | PurePosixPath, sanitizacion, bloqueo parent |
+| Config Paths | ✅ CENTRALIZADO | `config.py` | 10+ rutas extraídas, soportado por env |
 
 ---
 
@@ -354,35 +362,41 @@ uvicorn main:app --host 0.0.0.0 --port 9090 --reload  # Producción LAN
 - [x] Evals: baselines + regression_tests
 - [x] Docs: ENTORNO, BENCHMARK, ANALYSIS, AUTO_TUNING, IMPLEMENTATION_SUMMARY
 
-### FASE 1: Dashboard MVP 🟡 EN PROGRESO
+### FASE 1: Dashboard MVP 🟢 FUNCIONAL
 
-#### Paso 1: Setup Base ⏳ PENDIENTE
-- [ ] Crear estructura `dashboard/` (ya existe)
-- [ ] `requirements.txt` (ya creado)
-- [ ] `main.py` FastAPI (ya creado)
-- [ ] `base.html` con Tailwind + Alpine + HTMX (ya creado)
-- [ ] Health check endpoint `/health`
+#### Paso 1: Setup Base ✅ COMPLETADO
+- [x] Crear estructura `dashboard/`
+- [x] `requirements.txt`
+- [x] `main.py` FastAPI
+- [x] `base.html` con Tailwind + Alpine + HTMX
+- [x] Health check endpoint `/health`
 
-#### Paso 2: Model Scanner + Backend Status ⏳ PENDIENTE
-- [ ] `utils/model_scanner.py` - Escaneo GGUF recursivo
-- [ ] `utils/script_runner.py` - Wrapper subprocess
-- [ ] `utils/event_logger.py` - Event Sourcing (JSONL)
-- [ ] Endpoints: `GET /api/models`, `POST /api/models/scan`, `GET /api/backends`
+#### Paso 2: Model Scanner + Backend Status ✅ COMPLETADO
+- [x] `utils/model_scanner.py` - Escaneo GGUF recursivo
+- [x] `utils/script_runner.py` - Wrapper subprocess
+- [x] `utils/event_logger.py` - Event Sourcing (JSONL)
+- [x] Endpoints: `GET /api/models`, `POST /api/models/scan`, `GET /api/backends`
 
-#### Paso 3-7: Tabs + Integración ⏳ PENDIENTE
-- [ ] Tab Modelos (listado, filtros, selección)
-- [ ] Tab Benchmark (formulario, progreso, resultados)
-- [ ] Tab Tuning (selector perfil, progreso, presets)
-- [ ] Tab Launch (generar .bat, preview, ejecutar)
-- [ ] WebSocket + Notificaciones + Polish
+#### Paso 3-7: Tabs + Integración ✅ COMPLETADO
+- [x] Tab Modelos (listado, filtros, selección)
+- [x] Tab Benchmark (formulario, progreso, resultados)
+- [x] Tab Tuning (selector perfil, progreso, presets)
+- [x] Tab Launch (generar .bat, preview, ejecutar)
+- [x] WebSocket + Notificaciones + Polish
 
-### FASE 2: Event Sourcing + Blog Pipeline ⏳ FUTURO
-- [ ] Event Logger completo
-- [ ] Blog Draft Generator (Astro-ready)
-- [ ] Blog Sync automático a repo Astro
+#### P2-#6: Modularización ✅ COMPLETADO (2026-09-06)
+- [x] Split `main.py` (~880 líneas) en routers modulares
+- [x] 6 routers: benchmark, tuning, launch, llama, events, blog
+- [x] Inyeccion de estado compartido en cada router
+- [x] Verificacion endpoints funcionando
+
+### FASE 2: Event Sourcing + Blog Pipeline 🟡 EN PROGRESO
+- [x] Event Logger completo
+- [x] Blog Draft Generator (Astro-ready)
+- [ ] Blog Sync automatico a repo Astro
 
 ### FASE 3: Dashboard Avanzado ⏳ FUTURO
-- [ ] Análisis visual (Chrome Trace, Plotly)
+- [ ] Analisis visual (Chrome Trace, Plotly)
 - [ ] Historial runs + filtros
 - [ ] Comparativas visuales (heatmaps)
 - [ ] CI/CD Integration
@@ -396,33 +410,25 @@ uvicorn main:app --host 0.0.0.0 --port 9090 --reload  # Producción LAN
 ### Documentación (docs/)
 ```
 docs/
-├── ENTORNO_RX9070_LLAMA_CPP.md          # Documentación entorno completo
+├── ENTORNO_RX9070_LLAMA_CPP.md          # Documentacion entorno completo
 ├── BENCHMARK_RESULTS_QWEN3.5-9B.md      # 32+ combos Vulkan/HIP
-├── ANALYSIS_RESULTS.md                  # Análisis profundo (CPU vs GPU)
-├── AUTO_TUNING_RESULTS.md               # 5 perfiles optimización
+├── ANALYSIS_RESULTS.md                  # Analisis profundo (CPU vs GPU)
+├── AUTO_TUNING_RESULTS.md               # 5 perfiles optimizacion
 ├── IMPLEMENTATION_SUMMARY.md            # Resumen skill completado
-├── BENCHMARK_RESULTS_QWEN3.5-9B.md      # Detalles benchmarks
-├── tune_throughput.json                 # Perfil throughput
-├── tune_latency.json                    # Perfil latency
-├── tune_balanced.json                   # Perfil balanced
-├── tune_maxctx.json                     # Perfil max_context
-├── tune_mem.json                        # Perfil memory_efficient
-├── tune_qwen27b.json                    # Qwen3.8-27B
-├── analyze_scaling_batch.json           # Batch scaling analysis
-├── analyze_scaling_ngl.json             # n_gpu_layers sweep
-├── analyze_scaling_prompt.json          # Prompt size scaling
-├── analyze_compare.json                 # HIP vs CPU
-├── analyze_compare_vulkan.json          # Vulkan comparison
-└── analyze_comprehensive.json           # Both backends
+└── traces/
+    ├── Qwen3.5-9B-UD-Q4_K_XL_hip_default_*.chrome_trace.json
+    ├── Qwen3.5-9B-UD-Q4_K_XL_vulkan_default_*.chrome_trace.json
+    ├── Qwen3.5-9B-UD-Q4_K_XL_*.prometheus.metrics
+    └── Qwen3.8-27B-UD-Q3_K_XL_*.prometheus.metrics
 ```
 
-### Traces (docs/traces/)
+### Dashboard Data
 ```
-traces/
-├── Qwen3.5-9B-UD-Q4_K_XL_hip_default_*.chrome_trace.json
-├── Qwen3.5-9B-UD-Q4_K_XL_vulkan_default_*.chrome_trace.json
-├── Qwen3.5-9B-UD-Q4_K_XL_*.prometheus.metrics
-└── Qwen3.8-27B-UD-Q3_K_XL_*.prometheus.metrics
+dashboard/data/
+├── events.jsonl                         # Event store (rotacion 5000 lineas)
+└── blog_drafts/                         # 12 drafts generados
+    ├── benchmark_completed_*.md
+    └── tuning_completed_*.md
 ```
 
 ### Baselines (docs/baselines/)
@@ -438,49 +444,48 @@ baselines/
 
 ## 🎯 11. RECOMENDACIONES
 
-### 1. Priorizar Dashboard MVP (Paso 1-2)
-- Estructura y main.py ya existen
-- Faltan: utils (scanner, runner, logger) + endpoints
-- **Tiempo estimado**: 2-3 horas
+### 1. Priorizar Blog Sync a Astro
+- Blog drafts generados automaticamente
+- **Tiempo estimado**: 1 hora
 
 ### 2. Mejorar Profiling
 - `GGML_METRICS=OFF` en build actual
 - ROCm SDK sin `rocprof`/`roc-tracer`
-- **Recomendación**: Contribuir kernels con profiling a llama.cpp upstream
+- **Recomendacion**: Contribuir kernels con profiling a llama.cpp upstream
 
 ### 3. Flash Attention en RDNA 4
 - HIP usa SDPA fallback (no FA nativo)
 - Vulkan tiene FA nativo pero kernels menos optimizados
-- **Investigar**: Kernels FA específicos para gfx1201
+- **Investigar**: Kernels FA especificos para gfx1201
 
 ### 4. VRAM Estimation
-- Heurística subestima modelos >10GB
-- **Solución**: Usar `GGML_METRICS=1` o herramientas de monitoreo GPU
+- Heuristica subestima modelos >10GB
+- **Solucion**: Usar `GGML_METRICS=1` o herramientas de monitoreo GPU
 
-### 5. Contribución Upstream
+### 5. Contribucion Upstream
 - Skill sigue formato AMD Skills
-- **Acción**: Contribuir a `amd/skills` repo
+- **Accion**: Contribuir a `amd/skills` repo
 
 ### 6. Testing de Modelos
 - Solo 10 modelos testeados
-- **Añadir**: Qwen3.8-9B-Distill, Apertus, InternVL, Llama-Vision
+- **Anadir**: Qwen3.8-9B-Distill, Apertus, InternVL, Llama-Vision
 
 ---
 
-## 📈 12. METRICAS DE ÉXITO
+## 📈 12. METRICAS DE EXITO
 
 | KPI | Target | Estado |
 |-----|--------|--------|
 | Skill `local-ai-use` completo | ✅ | 100% |
 | Scripts validados | ✅ | 100% |
-| Dashboard MVP funcional | 🟡 | 30% |
-| Event logging | ⏳ | 0% |
-| Blog automation | ⏳ | 0% |
-| Documentación completa | ✅ | 100% |
+| Dashboard MVP funcional | 🟢 | 95% |
+| Event logging | ✅ | 100% |
+| Blog automation | 🟡 | 80% |
+| Documentacion completa | ✅ | 100% |
 
 ---
 
-## 🔗 13. INTEGRACIÓN AMD SKILLS CATALOG
+## 🔗 13. INTEGRACION AMD SKILLS CATALOG
 
 El skill `local-ai-use` se integra con:
 - **serving-llms-on-instinct** — MI300X/MI325X datacenter
@@ -488,11 +493,11 @@ El skill `local-ai-use` se integra con:
 - **lemonade-router-builder** — Multi-model routing
 - **hyperloom-workload-optimizer** — Cluster optimization
 
-**Auto-selección de backend** vía `gpu_presets.json` basado en `deviceID`/`gfx_version`.
+**Auto-seleccion de backend** via `gpu_presets.json` basado en `deviceID`/`gfx_version`.
 
 ---
 
-## 📝 14. NOTAS TÉCNICAS IMPORTANTES
+## 📝 14. NOTAS TECNICAS IMPORTANTES
 
 1. **ROCm en Windows**: Requiere `_rocm_sdk_devel` en PATH permanentemente
    ```
@@ -509,7 +514,11 @@ El skill `local-ai-use` se integra con:
    - HIP: SDPA fallback en RDNA 4
    - Vulkan: Nativo pero kernels menos optimizados
 
-5. **VRAM Estimation**: Heurística, subestima modelos >10GB
+5. **VRAM Estimation**: Heuristica, subestima modelos >10GB
+
+6. **Routers Modulares**: `main.py` ahora ~90 lineas, routers inyectan estado compartido via loop for
+
+7. **Import Strategy**: `run_dashboard.py` añade `dashboard/` a sys.path, routers usan imports absolutos
 
 ---
 
@@ -518,20 +527,27 @@ El skill `local-ai-use` se integra con:
 ### Lo que funciona perfectamente:
 ✅ Skill `local-ai-use` completo y validado  
 ✅ 4 scripts con capacidades robustas  
-✅ Documentación extensa y precisa  
-✅ Hallazgos técnicos bien documentados  
-✅ Presets y baselines para regresión  
+✅ Documentacion extensa y precisa  
+✅ Hallazgos tecnicos bien documentados  
+✅ Presets y baselines para regresion  
+✅ Dashboard MVP funcional (95%)  
+✅ 6 routers modulares implementados  
+✅ Todos endpoints verificados y respondiendo  
+✅ WebSocket + notificaciones tiempo real  
+✅ Event sourcing con rotacion  
+✅ Blog drafts generados automaticamente  
 
-### Lo que necesita atención:
-🟡 Dashboard MVP (30% completado)  
-⏳ Event sourcing + Blog pipeline  
-⏳ WebSocket + notificaciones tiempo real  
-⏳ Integración CI/CD  
+### Lo que necesita atencion:
+🟡 Blog Sync automatico a repo Astro  
+⏳ Analisis visual (Chrome Trace, Plotly)  
+⏳ Comparativas visuales (heatmaps)  
+⏳ CI/CD Integration  
+⏳ Multi-usuario + Auth  
 
-### Hallazgo más importante:
-**CPU Zen 4 supera a GPU RX 9070 en 2.7-9x para modelos ≤8GB Q4_K**. La GPU no está bien aprovechada por kernels actuales. HIP > Vulkan en GPU (+20% decode, +55% prefill).
+### Hallazgo mas importante:
+**CPU Zen 4 supera a GPU RX 9070 en 2.7-9x para modelos ≤8GB Q4_K**. La GPU no esta bien aprovechada por kernels actuales. HIP > Vulkan en GPU (+20% decode, +55% prefill).
 
 ---
 
 **Fin del informe**  
-*Generado por análisis automático de G:\Proyectos\AMD.AI\*
+*Actualizado: 2026-09-06 - Dashboard modularizado con routers, endpoints verificados*
