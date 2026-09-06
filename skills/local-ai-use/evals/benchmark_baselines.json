@@ -1,0 +1,174 @@
+{
+  "version": "1.0",
+  "generated": "2026-09-05",
+  "description": "Regression baselines for local-ai-use skill. Used by analyze_local.py --compare-baseline for CI/CD.",
+  "hardware_profile": {
+    "gpu": "AMD Radeon RX 9070",
+    "vram_gb": 16,
+    "driver": "AMD Adrenalin 2.0.395",
+    "vulkan_version": "1.4.357",
+    "hip_version": "7.2.0-8017ffed34",
+    "cpu": "AMD Ryzen 7 7800X3D",
+    "os": "Windows 11"
+  },
+  "llama_cpp_builds": {
+    "vulkan_b10712": {
+      "path": "G:\\llama.cpp\\bin\\llama-b10712-bin-win-vulkan-x64",
+      "commit": "daef7b687",
+      "build_number": 10712,
+      "backends": ["Vulkan", "CPU"],
+      "ggml_vulkan_dll": "53.0 MB"
+    },
+    "vulkan_b10796": {
+      "path": "G:\\llama.cpp\\bin\\llama-b10796-bin-win-vulkan-x64",
+      "commit": "daef7b687",
+      "build_number": 10796,
+      "backends": ["Vulkan", "CPU"],
+      "ggml_vulkan_dll": "53.0 MB"
+    },
+    "hip_build": {
+      "path": "G:\\llama.cpp-src\\build-hip\\bin",
+      "commit": "daef7b687",
+      "backends": ["HIP", "CPU"],
+      "ggml_hip_dll": "66.7 MB",
+      "rocm_sdk": "_rocm_sdk_devel 7.2.0"
+    }
+  },
+  "baselines": [
+    {
+      "name": "qwen35_9b_hip_v1",
+      "model": "Qwen3.5-9B-UD-Q4_K_XL",
+      "model_size_gb": 5.56,
+      "quantization": "Q4_K_XL",
+      "backend": "hip",
+      "build": "hip_build",
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type_k": "q4_0",
+        "cache_type_v": "q4_0"
+      },
+      "metrics": {
+        "prefill_tok_s": 395.7,
+        "decode_tok_s": 3391.7,
+        "prefill_ms": 1293.8,
+        "decode_ms": 75.5,
+        "vram_peak_mb": 6632
+      },
+      "repetitions": 2,
+      "timestamp": "2026-09-05T14:30:34",
+      "trace_file": "traces/Qwen3.5-9B-UD-Q4_K_XL_hip_default_20260905_143034.chrome_trace.json",
+      "prometheus_file": "traces/Qwen3.5-9B-UD-Q4_K_XL_hip_default.prometheus.metrics"
+    },
+    {
+      "name": "qwen35_9b_vulkan_v1",
+      "model": "Qwen3.5-9B-UD-Q4_K_XL",
+      "model_size_gb": 5.56,
+      "quantization": "Q4_K_XL",
+      "backend": "vulkan",
+      "build": "vulkan_b10712",
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type_k": "q4_0",
+        "cache_type_v": "q4_0"
+      },
+      "metrics": {
+        "prefill_tok_s": 271.0,
+        "decode_tok_s": 2887.4,
+        "prefill_ms": 1882.0,
+        "decode_ms": 88.7,
+        "vram_peak_mb": 6112
+      },
+      "repetitions": 2,
+      "timestamp": "2026-09-05T15:10:47",
+      "trace_file": "traces/Qwen3.5-9B-UD-Q4_K_XL_vulkan_default_20260905_151047.chrome_trace.json",
+      "prometheus_file": "traces/Qwen3.5-9B-UD-Q4_K_XL_vulkan_default.prometheus.metrics"
+    },
+    {
+      "name": "qwen35_9b_cpu_v1",
+      "model": "Qwen3.5-9B-UD-Q4_K_XL",
+      "model_size_gb": 5.56,
+      "quantization": "Q4_K_XL",
+      "backend": "cpu",
+      "build": "hip_build",
+      "config": {
+        "n_gpu_layers": 0,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "off",
+        "cache_type_k": "f16",
+        "cache_type_v": "f16"
+      },
+      "metrics": {
+        "prefill_tok_s": 1598.3,
+        "decode_tok_s": 27454.0,
+        "prefill_ms": 319.1,
+        "decode_ms": 9.3,
+        "vram_peak_mb": 512
+      },
+      "repetitions": 2,
+      "timestamp": "2026-09-05T12:00:00",
+      "note": "CPU-only baseline (ngl=0) using ggml-cpu-zen4.dll"
+    },
+    {
+      "name": "qwen38_27b_hip_v1",
+      "model": "Qwen3.8-27B-UD-Q3_K_XL",
+      "model_size_gb": 12.24,
+      "quantization": "Q3_K",
+      "backend": "hip",
+      "build": "hip_build",
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type_k": "q4_0",
+        "cache_type_v": "q4_0"
+      },
+      "metrics": {
+        "prefill_tok_s": 1806.6,
+        "decode_tok_s": 15887.9,
+        "prefill_ms": 282.3,
+        "decode_ms": 16.1,
+        "vram_peak_mb": 6632
+      },
+      "repetitions": 1,
+      "timestamp": "2026-09-05T15:45:00",
+      "note": "Large model (12.24GB Q3_K) - fits in 16GB VRAM with headroom"
+    }
+  ],
+  "regression_thresholds": {
+    "decode_throughput_pct": -5.0,
+    "prefill_throughput_pct": -5.0,
+    "memory_increase_pct": 10.0,
+    "latency_increase_pct": 10.0
+  },
+  "ci_cd_integration": {
+    "github_actions_example": {
+      "name": "Local AI Regression Test",
+      "on": ["push", "pull_request"],
+      "jobs": {
+        "regression": {
+          "runs-on": "windows-latest",
+          "steps": [
+            { "uses": "actions/checkout@v4" },
+            { "name": "Setup Python", "uses": "actions/setup-python@v5", "with": { "python-version": "3.13" } },
+            { "name": "Install ROCm SDK", "run": "pip install _rocm_sdk_devel" },
+            { "name": "Download llama.cpp builds", "run": "scripts/download_builds.ps1" },
+            { "name": "Download models", "run": "scripts/download_models.ps1" },
+            { "name": "Run regression", "run": "python scripts/analyze_local.py --model Qwen3.5-9B --backend hip --compare-baseline baselines/qwen35_9b_hip_v1.json --yes" }
+          ]
+        }
+      }
+    }
+  }
+}

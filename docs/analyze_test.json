@@ -1,0 +1,31 @@
+{
+  "model": "Qwen3.5-9B-UD-Q4_K_XL",
+  "config": "default",
+  "backend": "hip",
+  "profiles": [
+    {
+      "timestamp": "2026-09-05T14:03:21.567307",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "backend": "hip",
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "total_time_ms": 7371.076822280884,
+      "prefill_time_ms": 652.638757,
+      "decode_time_ms": 73.606261,
+      "layer_timings": [],
+      "memory_peak_mb": 0,
+      "memory_avg_mb": 0,
+      "compute_bound_layers": [],
+      "memory_bound_layers": [],
+      "bottlenecks": [],
+      "recommendations": []
+    }
+  ],
+  "timestamp": "2026-09-05T14:03:21.568273"
+}

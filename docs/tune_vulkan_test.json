@@ -1,0 +1,394 @@
+{
+  "model": "Qwen3.5-9B-UD-Q4_K_XL",
+  "profile": "throughput",
+  "backend": "vulkan",
+  "search_space": {
+    "n_gpu_layers": [
+      -1,
+      0,
+      20,
+      40,
+      999
+    ],
+    "prompt_size": [
+      512,
+      2048
+    ],
+    "gen_size": [
+      128,
+      256
+    ],
+    "batch_size": [
+      1024,
+      2048
+    ],
+    "flash_attn": [
+      "auto"
+    ],
+    "cache_type": [
+      "q4_0"
+    ]
+  },
+  "results": [
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 128,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 306.5832000371555,
+      "decode_tok_s": 1509.2338997845818,
+      "prefill_ms": 3.261757330078125,
+      "decode_ms": 0.6625878203125,
+      "vram_used_mb": 6112.0,
+      "vram_peak_mb": null,
+      "score": 1539.8922197882973,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 128,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 378.6865001354322,
+      "decode_tok_s": 1503.6147073770192,
+      "prefill_ms": 2.6407067578125,
+      "decode_ms": 0.6650639921875,
+      "vram_used_mb": 6624.0,
+      "vram_peak_mb": null,
+      "score": 1541.4833573905623,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 305.1907999293946,
+      "decode_tok_s": 2979.3811115500657,
+      "prefill_ms": 3.27663874609375,
+      "decode_ms": 0.33564017578125,
+      "vram_used_mb": 6120.0,
+      "vram_peak_mb": null,
+      "score": 3009.9001915430053,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 303.98799998820385,
+      "decode_tok_s": 2992.116182936347,
+      "prefill_ms": 3.289603537109375,
+      "decode_ms": 0.33421162109375,
+      "vram_used_mb": 6632.0,
+      "vram_peak_mb": null,
+      "score": 3022.514982935167,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 128,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1069.5789999285314,
+      "decode_tok_s": 1492.0095950670805,
+      "prefill_ms": 0.9349473017578125,
+      "decode_ms": 0.6702369765625,
+      "vram_used_mb": 6208.0,
+      "vram_peak_mb": null,
+      "score": 1598.9674950599335,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 128,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 978.3083001444114,
+      "decode_tok_s": 1505.3804059827487,
+      "prefill_ms": 1.0221726625976562,
+      "decode_ms": 0.664283921875,
+      "vram_used_mb": 6720.0,
+      "vram_peak_mb": null,
+      "score": 1603.2112359971898,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 256,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1137.5287000698877,
+      "decode_tok_s": 2967.5002158392736,
+      "prefill_ms": 0.8790986987304688,
+      "decode_ms": 0.33698396875,
+      "vram_used_mb": 6216.0,
+      "vram_peak_mb": null,
+      "score": 3081.2530858462624,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1073.0537997690926,
+      "decode_tok_s": 2985.258385949387,
+      "prefill_ms": 0.9319197231445312,
+      "decode_ms": 0.33497937890625,
+      "vram_used_mb": 6728.0,
+      "vram_peak_mb": null,
+      "score": 3092.563765926296,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 128,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 351.2800000675665,
+      "decode_tok_s": 1506.90279205542,
+      "prefill_ms": 2.846731951171875,
+      "decode_ms": 0.6636128125,
+      "vram_used_mb": 6112.0,
+      "vram_peak_mb": null,
+      "score": 1542.0307920621765,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 128,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 370.9995000723768,
+      "decode_tok_s": 1507.4657950122576,
+      "prefill_ms": 2.695421421875,
+      "decode_ms": 0.66336496875,
+      "vram_used_mb": 6624.0,
+      "vram_peak_mb": null,
+      "score": 1544.5657450194954,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 287.3647999199878,
+      "decode_tok_s": 2988.6564144855506,
+      "prefill_ms": 3.479897330078125,
+      "decode_ms": 0.334598515625,
+      "vram_used_mb": 6120.0,
+      "vram_peak_mb": null,
+      "score": 3017.3928944775494,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 359.41840006795985,
+      "decode_tok_s": 2987.146716079674,
+      "prefill_ms": 2.782272693359375,
+      "decode_ms": 0.33476762109375,
+      "vram_used_mb": 6632.0,
+      "vram_peak_mb": null,
+      "score": 3023.0885560864704,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 128,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1035.8636998222662,
+      "decode_tok_s": 1492.141607082907,
+      "prefill_ms": 0.9653779741210937,
+      "decode_ms": 0.6701776796875,
+      "vram_used_mb": 6208.0,
+      "vram_peak_mb": null,
+      "score": 1595.7279770651337,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 128,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 977.3087999040818,
+      "decode_tok_s": 1492.4997920994429,
+      "prefill_ms": 1.0232180454101563,
+      "decode_ms": 0.67001684375,
+      "vram_used_mb": 6720.0,
+      "vram_peak_mb": null,
+      "score": 1590.230672089851,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 256,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1029.8125001524543,
+      "decode_tok_s": 2978.0265034819818,
+      "prefill_ms": 0.9710505551757812,
+      "decode_ms": 0.33579284765625,
+      "vram_used_mb": 6216.0,
+      "vram_peak_mb": null,
+      "score": 3081.007753497227,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 977.7131000617419,
+      "decode_tok_s": 2993.3176988608275,
+      "prefill_ms": 1.0227949282226563,
+      "decode_ms": 0.33407746875,
+      "vram_used_mb": 6728.0,
+      "vram_peak_mb": null,
+      "score": 3091.0890088670017,
+      "success": true,
+      "error": null
+    }
+  ],
+  "best_by_backend": {
+    "vulkan": {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "vulkan",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 977.7131000617419,
+      "decode_tok_s": 2993.3176988608275,
+      "prefill_ms": 1.0227949282226563,
+      "decode_ms": 0.33407746875,
+      "vram_used_mb": 6728.0,
+      "vram_peak_mb": null,
+      "score": 3091.0890088670017,
+      "success": true,
+      "error": null
+    }
+  },
+  "timestamp": "2026-09-05T13:36:53.675170"
+}

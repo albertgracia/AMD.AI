@@ -1,0 +1,42 @@
+{
+  "model": "Qwen3.5-9B-UD-Q4_K_XL",
+  "config": "default",
+  "backend": "hip",
+  "results": {
+    "hip": [
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 512,
+          "gen_size": 256,
+          "batch_size": 2048,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 292.3012149724935,
+        "decode_tok_s": 3334.502319537125,
+        "prefill_ms": 1751.617762,
+        "decode_ms": 76.773076,
+        "success": true,
+        "error": null
+      },
+      {
+        "config": {
+          "n_gpu_layers": 0,
+          "prompt_size": 512,
+          "gen_size": 256,
+          "batch_size": 2048,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 1080.9714364318766,
+        "decode_tok_s": 27349.372529542397,
+        "prefill_ms": 473.648038,
+        "decode_ms": 9.360361,
+        "success": true,
+        "error": null
+      }
+    ]
+  },
+  "timestamp": "2026-09-05T15:03:53.960285"
+}

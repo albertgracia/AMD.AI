@@ -1,0 +1,74 @@
+{
+  "model": "Qwen3.5-9B-UD-Q4_K_XL",
+  "config": "default",
+  "backend": "hip",
+  "results": {
+    "hip": [
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 512,
+          "gen_size": 256,
+          "batch_size": 512,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 407.6134174223254,
+        "decode_tok_s": 3447.8297898015753,
+        "prefill_ms": 1256.092116,
+        "decode_ms": 74.249605,
+        "success": true,
+        "error": null
+      },
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 512,
+          "gen_size": 256,
+          "batch_size": 1024,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 405.4940194621607,
+        "decode_tok_s": 3442.5443780950795,
+        "prefill_ms": 1262.65734,
+        "decode_ms": 74.363602,
+        "success": true,
+        "error": null
+      },
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 512,
+          "gen_size": 256,
+          "batch_size": 2048,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 451.5256419127958,
+        "decode_tok_s": 3442.3749988587047,
+        "prefill_ms": 1133.933386,
+        "decode_ms": 74.367261,
+        "success": true,
+        "error": null
+      },
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 512,
+          "gen_size": 256,
+          "batch_size": 4096,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 454.2623531977898,
+        "decode_tok_s": 3451.3037488654513,
+        "prefill_ms": 1127.101985,
+        "decode_ms": 74.174868,
+        "success": true,
+        "error": null
+      }
+    ]
+  },
+  "timestamp": "2026-09-05T14:17:56.474142"
+}

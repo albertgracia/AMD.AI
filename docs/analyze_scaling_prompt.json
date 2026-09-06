@@ -1,0 +1,90 @@
+{
+  "model": "Qwen3.5-9B-UD-Q4_K_XL",
+  "config": "default",
+  "backend": "hip",
+  "results": {
+    "hip": [
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 512,
+          "gen_size": 256,
+          "batch_size": 2048,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 293.20501545687506,
+        "decode_tok_s": 3354.510075899984,
+        "prefill_ms": 1746.218424,
+        "decode_ms": 76.315168,
+        "success": true,
+        "error": null
+      },
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 1024,
+          "gen_size": 256,
+          "batch_size": 2048,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 527.6557674440022,
+        "decode_tok_s": 3352.680219003358,
+        "prefill_ms": 1940.659163,
+        "decode_ms": 76.35682,
+        "success": true,
+        "error": null
+      },
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 2048,
+          "gen_size": 256,
+          "batch_size": 2048,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 918.3320192224846,
+        "decode_tok_s": 3349.7017731724845,
+        "prefill_ms": 2230.130233,
+        "decode_ms": 76.424714,
+        "success": true,
+        "error": null
+      },
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 4096,
+          "gen_size": 256,
+          "batch_size": 2048,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 1698.1372761993593,
+        "decode_tok_s": 3351.6257034289906,
+        "prefill_ms": 2412.054701,
+        "decode_ms": 76.380844,
+        "success": true,
+        "error": null
+      },
+      {
+        "config": {
+          "n_gpu_layers": -1,
+          "prompt_size": 8192,
+          "gen_size": 256,
+          "batch_size": 2048,
+          "flash_attn": "auto",
+          "cache_type": "q4_0"
+        },
+        "prefill_tok_s": 3356.0956863454853,
+        "decode_tok_s": 3350.7235449021628,
+        "prefill_ms": 2440.931596,
+        "decode_ms": 76.401409,
+        "success": true,
+        "error": null
+      }
+    ]
+  },
+  "timestamp": "2026-09-05T14:29:04.660810"
+}

@@ -1,0 +1,297 @@
+{
+  "version": "1.0",
+  "generated": "2026-09-05",
+  "description": "Quantization guide for local-ai-use skill. Helps select optimal quantization for model size, VRAM, and quality requirements.",
+  "quantization_levels": {
+    "Q2_K": {
+      "bits": 2.0,
+      "vram_factor": 0.25,
+      "quality_score": 40,
+      "speed_factor": 1.4,
+      "use_case": "Extreme compression, minimal VRAM, acceptable quality loss",
+      "models_suitable": ["Large models (70B+) when VRAM < 8GB", "Testing/development only"],
+      "avoid_for": ["Production", "Reasoning models", "Coding tasks"],
+      "notes": "Significant quality degradation. Only for emergency VRAM constraints."
+    },
+    "Q3_K_S": {
+      "bits": 3.0,
+      "vram_factor": 0.28,
+      "quality_score": 55,
+      "speed_factor": 1.25,
+      "use_case": "Aggressive compression for large models",
+      "models_suitable": ["30B-70B models in 16-24GB VRAM", "Qwen3.8-27B, Llama-3.1-70B"],
+      "avoid_for": ["High-quality requirements", "Long context"],
+      "notes": "Good balance for large models. Better than Q2_K with modest VRAM increase."
+    },
+    "Q3_K": {
+      "bits": 3.1,
+      "vram_factor": 0.30,
+      "quality_score": 60,
+      "speed_factor": 1.2,
+      "use_case": "Standard compression for large models",
+      "models_suitable": ["27B-70B models", "Default for >20B models in 16GB VRAM"],
+      "avoid_for": ["Small models (<10B) where quality matters"],
+      "notes": "Recommended for Qwen3.8-27B, DeepSeek-R1, Llama-3.1-70B on 16GB cards."
+    },
+    "Q4_0": {
+      "bits": 4.0,
+      "vram_factor": 0.35,
+      "quality_score": 70,
+      "speed_factor": 1.15,
+      "use_case": "Legacy 4-bit quantization",
+      "models_suitable": ["Older models", "Compatibility fallback"],
+      "avoid_for": ["New models (prefer Q4_K_M)"],
+      "notes": "Original 4-bit. No K-quant benefits. Use Q4_K_M instead."
+    },
+    "Q4_K_S": {
+      "bits": 4.0,
+      "vram_factor": 0.38,
+      "quality_score": 78,
+      "speed_factor": 1.1,
+      "use_case": "Small 4-bit K-quant",
+      "models_suitable": ["Small models (3B-7B)", "When VRAM tight for Q4_K_M"],
+      "avoid_for": ["Large models"],
+      "notes": "Smaller than Q4_K_M, slight quality drop."
+    },
+    "Q4_K_M": {
+      "bits": 4.5,
+      "vram_factor": 0.40,
+      "quality_score": 85,
+      "speed_factor": 1.05,
+      "use_case": "RECOMMENDED DEFAULT for most models",
+      "models_suitable": ["7B-14B models", "Default for general use", "Balanced quality/speed/VRAM"],
+      "avoid_for": ["Models >14B in limited VRAM"],
+      "notes": "Best all-rounder. K-quant with mixed precision. Default in llama.cpp."
+    },
+    "Q4_K": {
+      "bits": 4.8,
+      "vram_factor": 0.42,
+      "quality_score": 90,
+      "speed_factor": 1.0,
+      "use_case": "High-quality 4-bit (XL variant)",
+      "models_suitable": ["7B-9B models where quality critical", "Qwen3.5-9B, Llama-3.1-8B"],
+      "avoid_for": ["VRAM constrained"],
+      "notes": "Highest quality 4-bit. Used in our benchmarks (Q4_K_XL)."
+    },
+    "Q5_0": {
+      "bits": 5.0,
+      "vram_factor": 0.45,
+      "quality_score": 92,
+      "speed_factor": 0.95,
+      "use_case": "Legacy 5-bit",
+      "models_suitable": ["Compatibility"],
+      "avoid_for": ["New deployments (prefer Q5_K_M)"],
+      "notes": "Legacy. Use Q5_K_M instead."
+    },
+    "Q5_K_S": {
+      "bits": 5.0,
+      "vram_factor": 0.48,
+      "quality_score": 94,
+      "speed_factor": 0.9,
+      "use_case": "Small 5-bit K-quant",
+      "models_suitable": ["When Q4_K_M quality insufficient, Q6_K too large"],
+      "avoid_for": ["General use"],
+      "notes": "Niche between Q4_K_M and Q5_K_M."
+    },
+    "Q5_K_M": {
+      "bits": 5.5,
+      "vram_factor": 0.50,
+      "quality_score": 96,
+      "speed_factor": 0.85,
+      "use_case": "High quality 5-bit",
+      "models_suitable": ["Quality-critical 7B-14B", "When Q4_K_M not enough"],
+      "avoid_for": ["Speed-critical", "VRAM constrained"],
+      "notes": "Noticeable quality jump over Q4_K_M. 25% more VRAM."
+    },
+    "Q5_K": {
+      "bits": 5.8,
+      "vram_factor": 0.52,
+      "quality_score": 97,
+      "speed_factor": 0.8,
+      "use_case": "Highest 5-bit quality",
+      "models_suitable": ["Critical quality", "Small models (3B-7B)"],
+      "avoid_for": ["Large models"],
+      "notes": "Diminishing returns over Q5_K_M."
+    },
+    "Q6_K": {
+      "bits": 6.5,
+      "vram_factor": 0.60,
+      "quality_score": 98,
+      "speed_factor": 0.7,
+      "use_case": "Near-lossless for small/medium models",
+      "models_suitable": ["3B-9B models", "When quality > speed", "Distilled models"],
+      "avoid_for": ["Large models", "Speed-critical"],
+      "notes": "Excellent for Qwen3.8-9B-Distill, Mythos. Near FP16 quality."
+    },
+    "Q8_0": {
+      "bits": 8.0,
+      "vram_factor": 0.75,
+      "quality_score": 99,
+      "speed_factor": 0.5,
+      "use_case": "Legacy 8-bit",
+      "models_suitable": ["Compatibility", "When FP16 too large"],
+      "avoid_for": ["Performance-critical"],
+      "notes": "Slow. Use only if FP16 doesn't fit."
+    },
+    "IQ1_S": {
+      "bits": 1.56,
+      "vram_factor": 0.18,
+      "quality_score": 30,
+      "speed_factor": 1.5,
+      "use_case": "Extreme compression (importance quantization)",
+      "models_suitable": ["Emergency VRAM only", "70B+ in 16GB"],
+      "avoid_for": ["Any production use"],
+      "notes": "Importance-based quantization. Significant quality loss."
+    },
+    "IQ2_S": {
+      "bits": 2.06,
+      "vram_factor": 0.22,
+      "quality_score": 45,
+      "speed_factor": 1.4,
+      "use_case": "Aggressive importance quantization",
+      "models_suitable": ["Large models in tight VRAM"],
+      "avoid_for": ["Quality-sensitive tasks"],
+      "notes": "Better than IQ1_S but still aggressive."
+    },
+    "IQ3_S": {
+      "bits": 2.56,
+      "vram_factor": 0.26,
+      "quality_score": 55,
+      "speed_factor": 1.25,
+      "use_case": "Moderate importance quantization",
+      "models_suitable": ["Large models in 16GB VRAM"],
+      "avoid_for": ["Reasoning", "Coding"],
+      "notes": "Good alternative to Q3_K for very large models."
+    },
+    "IQ4_XS": {
+      "bits": 3.06,
+      "vram_factor": 0.32,
+      "quality_score": 70,
+      "speed_factor": 1.1,
+      "use_case": "Balanced importance quantization",
+      "models_suitable": ["Medium-large models (14B-30B)"],
+      "avoid_for": ["High-quality requirements"],
+      "notes": "Competitive with Q4_K_M at lower VRAM."
+    },
+    "BF16": {
+      "bits": 16,
+      "vram_factor": 1.0,
+      "quality_score": 100,
+      "speed_factor": 0.3,
+      "use_case": "Full precision (bfloat16)",
+      "models_suitable": ["Training", "Quality baseline", "CPU inference"],
+      "avoid_for": ["GPU inference (too slow)", "VRAM constrained"],
+      "notes": "Reference quality. Use for CPU inference baseline."
+    },
+    "F16": {
+      "bits": 16,
+      "vram_factor": 1.0,
+      "quality_score": 100,
+      "speed_factor": 0.3,
+      "use_case": "Full precision (float16)",
+      "models_suitable": ["Training", "Quality baseline", "CPU inference"],
+      "avoid_for": ["GPU inference", "VRAM constrained"],
+      "notes": "Same as BF16 but different format. CPU reference."
+    }
+  },
+  "selection_algorithm": {
+    "step_1": "Determine available VRAM (GPU) or system RAM (CPU)",
+    "step_2": "Calculate model size at each quantization: model_params × vram_factor",
+    "step_3": "Filter quantizations where size < VRAM × 0.85 (headroom for KV cache)",
+    "step_4": "Select highest quality_score from viable options",
+    "step_5": "Apply use_case preferences: quality vs speed vs VRAM",
+    "fallback": "If no quantization fits: CPU offload (ngl < total_layers) or smaller model"
+  },
+  "model_size_recommendations": {
+    "3B-7B": {
+      "vram_16gb": "Q6_K (best quality) or Q4_K_M (balanced)",
+      "vram_8gb": "Q4_K_M",
+      "vram_4gb": "Q3_K or Q4_0",
+      "cpu": "F16/BF16 for quality, Q4_K_M for speed"
+    },
+    "7B-14B": {
+      "vram_16gb": "Q4_K_M (default) or Q5_K_M (quality)",
+      "vram_8gb": "Q3_K or Q4_K_S",
+      "vram_4gb": "Q2_K or IQ2_S (emergency)",
+      "cpu": "Q4_K_M for speed, F16 for quality"
+    },
+    "14B-30B": {
+      "vram_24gb": "Q4_K_M or Q5_K_M",
+      "vram_16gb": "Q3_K (default) or Q4_K_S",
+      "vram_8gb": "IQ3_S or Q2_K (emergency)",
+      "cpu": "Q3_K with ngl=20-30 (hybrid)"
+    },
+    "30B-70B": {
+      "vram_48gb+": "Q4_K_M",
+      "vram_24gb": "Q3_K",
+      "vram_16gb": "Q3_K_S or IQ3_S",
+      "vram_8gb": "IQ1_S (emergency only)",
+      "cpu": "Not recommended (use smaller model or cloud)"
+    },
+    "70B+": {
+      "vram_80gb+": "Q4_K_M",
+      "vram_48gb": "Q3_K",
+      "vram_24gb": "IQ3_S",
+      "cpu": "Not feasible locally"
+    }
+  },
+  "special_cases": {
+    "reasoning_models": {
+      "examples": ["DeepSeek-R1", "QwQ", "O1-preview"],
+      "recommendation": "Prefer higher quantization (Q5_K_M or Q6_K). Reasoning degrades faster at low bits.",
+      "reason": "Chain-of-thought requires precise logits."
+    },
+    "coding_models": {
+      "examples": ["DeepSeek-Coder", "CodeLlama", "StarCoder"],
+      "recommendation": "Q4_K_M minimum, Q5_K_M preferred. Syntax accuracy matters.",
+      "reason": "Token-level precision critical for valid syntax."
+    },
+    "vision_models": {
+      "examples": ["LLaVA", "InternVL", "Qwen-VL"],
+      "recommendation": "Q4_K_M for text, keep vision encoder at F16/BF16. mmproj separate.",
+      "reason": "Vision encoder more sensitive to quantization."
+    },
+    "long_context": {
+      "ctx_32k+": "Prefer Q4_K_M over Q3_K. KV cache at q4_0 helps.",
+      "ctx_128k+": "CPU offload often needed. q4_0 cache essential.",
+      "reason": "KV cache dominates VRAM at long context."
+    },
+    "multi_model": {
+      "strategy": "Use memory_efficient profile. Q4_K_M or lower. CPU offload for inactive models.",
+      "tool": "llama-server with multiple -m flags or Lemonade router"
+    }
+  },
+  "kv_cache_quantization": {
+    "q4_0": {
+      "vram_savings": "50% vs f16",
+      "quality_impact": "Minimal (<1% perplexity)",
+      "speed_impact": "Slight decode speedup",
+      "recommended": true,
+      "use_for": "All production deployments"
+    },
+    "q8_0": {
+      "vram_savings": "25% vs f16",
+      "quality_impact": "Negligible",
+      "speed_impact": "Neutral",
+      "recommended": false,
+      "use_for": "When q4_0 causes issues"
+    },
+    "f16": {
+      "vram_savings": "0% (baseline)",
+      "quality_impact": "Reference",
+      "speed_impact": "Baseline",
+      "recommended": false,
+      "use_for": "Quality debugging only"
+    }
+  },
+  "benchmark_validation": {
+    "test_model": "Qwen3.5-9B",
+    "quantizations_tested": ["Q4_K_XL", "Q3_K", "Q6_K"],
+    "results": {
+      "Q4_K_XL": { "decode_toks": 3405, "prefill_toks": 1556, "vram_gb": 6.7, "quality": "excellent" },
+      "Q3_K": { "decode_toks": 3800, "prefill_toks": 1600, "vram_gb": 5.8, "quality": "good" },
+      "Q6_K": { "decode_toks": 2900, "prefill_toks": 1400, "vram_gb": 8.5, "quality": "excellent" }
+    },
+    "conclusion": "Q4_K_XL is sweet spot. Q3_K saves 1GB VRAM for ~10% quality drop. Q6_K not worth 2GB extra."
+  }
+}

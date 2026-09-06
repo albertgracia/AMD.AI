@@ -1,0 +1,226 @@
+{
+  "model": "Qwen3.5-9B-UD-Q4_K_XL",
+  "profile": "max_context",
+  "backend": "hip",
+  "search_space": {
+    "n_gpu_layers": [
+      -1,
+      0,
+      20,
+      40,
+      999
+    ],
+    "prompt_size": [
+      512,
+      2048
+    ],
+    "gen_size": [
+      128,
+      256
+    ],
+    "batch_size": [
+      1024,
+      2048
+    ],
+    "flash_attn": [
+      "auto"
+    ],
+    "cache_type": [
+      "q4_0"
+    ]
+  },
+  "results": [
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 128,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 822.7941993947443,
+      "decode_tok_s": 1784.7677960626154,
+      "prefill_ms": 1.21537074609375,
+      "decode_ms": 0.5602969765625,
+      "vram_used_mb": 6112.0,
+      "vram_peak_mb": null,
+      "score": 260.75619954573597,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 128,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 811.1734002680247,
+      "decode_tok_s": 1782.5570111866593,
+      "prefill_ms": 1.232782041015625,
+      "decode_ms": 0.560991875,
+      "vram_used_mb": 6624.0,
+      "vram_peak_mb": null,
+      "score": 259.3730411454684,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 807.4945996275229,
+      "decode_tok_s": 3488.9128142902273,
+      "prefill_ms": 1.238398375,
+      "decode_ms": 0.28662223828125,
+      "vram_used_mb": 6120.0,
+      "vram_peak_mb": null,
+      "score": 429.640741391775,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 512,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 814.049400037722,
+      "decode_tok_s": 3482.490818365345,
+      "prefill_ms": 1.228426677734375,
+      "decode_ms": 0.28715079296875,
+      "vram_used_mb": 6632.0,
+      "vram_peak_mb": null,
+      "score": 429.6540218403067,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 128,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1583.4531998256416,
+      "decode_tok_s": 1717.1026902397857,
+      "prefill_ms": 0.6315311372070312,
+      "decode_ms": 0.5823763515625,
+      "vram_used_mb": 6208.0,
+      "vram_peak_mb": null,
+      "score": 330.05558900654273,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 128,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1451.6154995935933,
+      "decode_tok_s": 1711.8424107833873,
+      "prefill_ms": 0.6888876567382812,
+      "decode_ms": 0.584165921875,
+      "vram_used_mb": 6720.0,
+      "vram_peak_mb": null,
+      "score": 316.34579103769806,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 256,
+        "batch_size": 1024,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1430.4070001503626,
+      "decode_tok_s": 3421.4940071195942,
+      "prefill_ms": 0.6991017241210937,
+      "decode_ms": 0.292269984375,
+      "vram_used_mb": 6216.0,
+      "vram_peak_mb": null,
+      "score": 485.19010072699575,
+      "success": true,
+      "error": null
+    },
+    {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1449.3086002555458,
+      "decode_tok_s": 3409.4907917511528,
+      "prefill_ms": 0.68998417578125,
+      "decode_ms": 0.2932989296875,
+      "vram_used_mb": 6728.0,
+      "vram_peak_mb": null,
+      "score": 485.87993920066987,
+      "success": true,
+      "error": null
+    }
+  ],
+  "best_by_backend": {
+    "hip": {
+      "config": {
+        "n_gpu_layers": -1,
+        "prompt_size": 2048,
+        "gen_size": 256,
+        "batch_size": 2048,
+        "flash_attn": "auto",
+        "cache_type": "q4_0"
+      },
+      "backend": "hip",
+      "model_name": "Qwen3.5-9B-UD-Q4_K_XL",
+      "prefill_tok_s": 1449.3086002555458,
+      "decode_tok_s": 3409.4907917511528,
+      "prefill_ms": 0.68998417578125,
+      "decode_ms": 0.2932989296875,
+      "vram_used_mb": 6728.0,
+      "vram_peak_mb": null,
+      "score": 485.87993920066987,
+      "success": true,
+      "error": null
+    }
+  },
+  "timestamp": "2026-09-05T13:41:11.816706"
+}

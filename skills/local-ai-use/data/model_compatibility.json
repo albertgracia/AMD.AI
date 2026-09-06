@@ -1,0 +1,479 @@
+{
+  "version": "1.0",
+  "generated": "2026-09-05",
+  "description": "Model × Backend × Quantization compatibility matrix for local-ai-use skill",
+  "hardware_profile": {
+    "gpu": "AMD Radeon RX 9070",
+    "vram_gb": 16,
+    "gfx_version_vulkan": "gfx1103",
+    "gfx_version_hip": "gfx1201",
+    "architecture": "RDNA 4",
+    "cpu": "AMD Ryzen 7 7800X3D"
+  },
+  "models": [
+    {
+      "name": "Qwen3.5-9B",
+      "base_model": "Qwen3.5-9B",
+      "size_gb": 5.56,
+      "quantization": "Q4_K_XL",
+      "files": [
+        "Qwen3.5-9B-UD-Q4_K_XL.gguf"
+      ],
+      "vram_estimate_gb": 6.5,
+      "vulkan": {
+        "compatible": true,
+        "max_context": 65536,
+        "recommended_ngl": -1,
+        "recommended_batch": 1024,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2900,
+        "expected_prefill_toks": 900
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 65536,
+        "recommended_ngl": -1,
+        "recommended_batch": 1024,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 3400,
+        "expected_prefill_toks": 1500
+      },
+      "cpu": {
+        "compatible": true,
+        "max_context": 131072,
+        "recommended_ngl": 0,
+        "recommended_batch": 2048,
+        "recommended_cache": "f16",
+        "expected_decode_toks": 27000,
+        "expected_prefill_toks": 3200
+      },
+      "optimal_backend": "hip",
+      "notes": "Excellent fit for 16GB VRAM. CPU (Zen 4) is 8x faster than GPU. Best all-rounder."
+    },
+    {
+      "name": "Qwen3.8-27B",
+      "base_model": "Qwen3.8-27B",
+      "size_gb": 12.24,
+      "quantization": "Q3_K",
+      "files": [
+        "Qwen3.8-27B-UD-Q3_K_XL.gguf"
+      ],
+      "vram_estimate_gb": 13.5,
+      "vulkan": {
+        "compatible": true,
+        "max_context": 4096,
+        "recommended_ngl": 30,
+        "recommended_batch": 512,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 800,
+        "expected_prefill_toks": 200
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 8192,
+        "recommended_ngl": -1,
+        "recommended_batch": 512,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 15800,
+        "expected_prefill_toks": 1800
+      },
+      "cpu": {
+        "compatible": false,
+        "reason": "Model too large for system RAM without offload"
+      },
+      "optimal_backend": "hip",
+      "notes": "Fits in 16GB with Q3_K. Requires GPU offload. HIP significantly better than Vulkan for large models."
+    },
+    {
+      "name": "Qwen3.8-9B-Distill",
+      "base_model": "Qwen3.8-9B",
+      "size_gb": 7.04,
+      "quantization": "Q6_K",
+      "files": [
+        "Qwen3.8-9B-Distill-Q6_K.gguf"
+      ],
+      "vram_estimate_gb": 8.0,
+      "vulkan": {
+        "compatible": true,
+        "max_context": 32768,
+        "recommended_ngl": -1,
+        "recommended_batch": 1024,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2500,
+        "expected_prefill_toks": 800
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 65536,
+        "recommended_ngl": -1,
+        "recommended_batch": 1024,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 3000,
+        "expected_prefill_toks": 1300
+      },
+      "cpu": {
+        "compatible": true,
+        "max_context": 131072,
+        "recommended_ngl": 0,
+        "recommended_batch": 2048,
+        "recommended_cache": "f16",
+        "expected_decode_toks": 25000,
+        "expected_prefill_toks": 2800
+      },
+      "optimal_backend": "hip",
+      "notes": "Good balance of quality/size. HIP preferred."
+    },
+    {
+      "name": "Apertus-1.5-8B",
+      "base_model": "Apertus-1.5-8B",
+      "size_gb": 7.98,
+      "quantization": "Q8_0",
+      "files": [
+        "apertus-1.5-8b-q8_0.gguf"
+      ],
+      "vram_estimate_gb": 9.5,
+      "vulkan": {
+        "compatible": true,
+        "max_context": 16384,
+        "recommended_ngl": -1,
+        "recommended_batch": 512,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2000,
+        "expected_prefill_toks": 600
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 32768,
+        "recommended_ngl": -1,
+        "recommended_batch": 512,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2500,
+        "expected_prefill_toks": 1000
+      },
+      "cpu": {
+        "compatible": true,
+        "max_context": 131072,
+        "recommended_ngl": 0,
+        "recommended_batch": 1024,
+        "recommended_cache": "f16",
+        "expected_decode_toks": 22000,
+        "expected_prefill_toks": 2200
+      },
+      "optimal_backend": "cpu",
+      "notes": "Q8_0 is heavy. CPU preferred for throughput, HIP for latency."
+    },
+    {
+      "name": "InternVL3-14B",
+      "base_model": "InternVL3-14B",
+      "size_gb": 8.5,
+      "quantization": "Q4_K_M",
+      "files": [
+        "internvl3-14b-q4_k_m.gguf"
+      ],
+      "vram_estimate_gb": 9.5,
+      "vulkan": {
+        "compatible": false,
+        "reason": "Vision model - limited llama.cpp vision support on Vulkan"
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 16384,
+        "recommended_ngl": -1,
+        "recommended_batch": 512,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 1800,
+        "expected_prefill_toks": 800
+      },
+      "cpu": {
+        "compatible": true,
+        "max_context": 32768,
+        "recommended_ngl": 0,
+        "recommended_batch": 512,
+        "recommended_cache": "f16",
+        "expected_decode_toks": 15000,
+        "expected_prefill_toks": 2000
+      },
+      "optimal_backend": "hip",
+      "notes": "Vision model. HIP has better mmproj support. Use CPU for max throughput."
+    },
+    {
+      "name": "Llama-3.2-11B-Vision",
+      "base_model": "Llama-3.2-11B-Vision",
+      "size_gb": 6.8,
+      "quantization": "Q4_K_M",
+      "files": [
+        "llama32-11b-vision-q4_k_m.gguf"
+      ],
+      "vram_estimate_gb": 8.0,
+      "vulkan": {
+        "compatible": false,
+        "reason": "Vision model - limited llama.cpp vision support on Vulkan"
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 32768,
+        "recommended_ngl": -1,
+        "recommended_batch": 512,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2200,
+        "expected_prefill_toks": 1000
+      },
+      "cpu": {
+        "compatible": true,
+        "max_context": 65536,
+        "recommended_ngl": 0,
+        "recommended_batch": 1024,
+        "recommended_cache": "f16",
+        "expected_decode_toks": 20000,
+        "expected_prefill_toks": 2500
+      },
+      "optimal_backend": "hip",
+      "notes": "Vision model. HIP required for mmproj."
+    },
+    {
+      "name": "Qwen2.5-VL-7B",
+      "base_model": "Qwen2.5-VL-7B",
+      "size_gb": 4.5,
+      "quantization": "Q4_K_M",
+      "files": [
+        "qwen25-vl-7b-q4_k_m.gguf"
+      ],
+      "vram_estimate_gb": 5.5,
+      "vulkan": {
+        "compatible": true,
+        "max_context": 32768,
+        "recommended_ngl": -1,
+        "recommended_batch": 1024,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2800,
+        "expected_prefill_toks": 1200
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 65536,
+        "recommended_ngl": -1,
+        "recommended_batch": 1024,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 3200,
+        "expected_prefill_toks": 1400
+      },
+      "cpu": {
+        "compatible": true,
+        "max_context": 131072,
+        "recommended_ngl": 0,
+        "recommended_batch": 2048,
+        "recommended_cache": "f16",
+        "expected_decode_toks": 28000,
+        "expected_prefill_toks": 3000
+      },
+      "optimal_backend": "hip",
+      "notes": "Small vision model. Good all-rounder."
+    },
+    {
+      "name": "Gemma-3-27B",
+      "base_model": "Gemma-3-27B",
+      "size_gb": 14.2,
+      "quantization": "Q4_K_M",
+      "files": [
+        "gemma-3-27b-q4_k_m.gguf"
+      ],
+      "vram_estimate_gb": 15.5,
+      "vulkan": {
+        "compatible": false,
+        "reason": "Too large for 16GB with Vulkan overhead"
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 4096,
+        "recommended_ngl": -1,
+        "recommended_batch": 256,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 800,
+        "expected_prefill_toks": 300
+      },
+      "cpu": {
+        "compatible": false,
+        "reason": "Too large for system RAM"
+      },
+      "optimal_backend": "hip",
+      "notes": "Tight fit in 16GB. Requires ngl=-1, small batch. Consider Q3_K for headroom."
+    },
+    {
+      "name": "DeepSeek-R1-Distill-Qwen-14B",
+      "base_model": "DeepSeek-R1-Distill-Qwen-14B",
+      "size_gb": 9.0,
+      "quantization": "Q4_K_M",
+      "files": [
+        "deepseek-r1-distill-qwen-14b-q4_k_m.gguf"
+      ],
+      "vram_estimate_gb": 10.5,
+      "vulkan": {
+        "compatible": true,
+        "max_context": 16384,
+        "recommended_ngl": -1,
+        "recommended_batch": 512,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2000,
+        "expected_prefill_toks": 800
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 32768,
+        "recommended_ngl": -1,
+        "recommended_batch": 512,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2800,
+        "expected_prefill_toks": 1200
+      },
+      "cpu": {
+        "compatible": true,
+        "max_context": 65536,
+        "recommended_ngl": 0,
+        "recommended_batch": 1024,
+        "recommended_cache": "f16",
+        "expected_decode_toks": 24000,
+        "expected_prefill_toks": 2200
+      },
+      "optimal_backend": "cpu",
+      "notes": "Reasoning model. CPU best for throughput. HIP for lower latency."
+    },
+    {
+      "name": "Gemma-4-12B",
+      "base_model": "google/gemma-4-12B-it",
+      "size_gb": 6.26,
+      "quantization": "Q4_K_XL",
+      "files": [
+        "gemma-4-12B-it-qat-UD-Q4_K_XL.gguf",
+        "mmproj-BF16.gguf",
+        "mtp-gemma-4-12B-it.gguf"
+      ],
+      "vram_estimate_gb": 8.0,
+      "vulkan": {
+        "compatible": true,
+        "max_context": 65536,
+        "recommended_ngl": -1,
+        "recommended_batch": 1024,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 2500,
+        "expected_prefill_toks": 1000
+      },
+      "hip": {
+        "compatible": true,
+        "max_context": 131072,
+        "recommended_ngl": -1,
+        "recommended_batch": 1024,
+        "recommended_cache": "q4_0",
+        "expected_decode_toks": 3000,
+        "expected_prefill_toks": 1400
+      },
+      "cpu": {
+        "compatible": true,
+        "max_context": 131072,
+        "recommended_ngl": 0,
+        "recommended_batch": 1024,
+        "recommended_cache": "f16",
+        "expected_decode_toks": 20000,
+        "expected_prefill_toks": 2200
+      },
+      "optimal_backend": "hip",
+      "notes": "Multimodal (texto+imagen). Requiere --mmproj mmproj-BF16.gguf. MTP local con --model-draft mtp-gemma-4-12B-it.gguf + --spec-type draft-mtp --spec-draft-n-max 4."
+    }
+  ],
+  "quantization_compatibility": {
+    "Q2_K": {
+      "vram_factor": 0.25,
+      "quality": "low",
+      "speed": "fastest"
+    },
+    "Q3_K": {
+      "vram_factor": 0.3,
+      "quality": "medium",
+      "speed": "fast"
+    },
+    "Q3_K_S": {
+      "vram_factor": 0.28,
+      "quality": "medium",
+      "speed": "fast"
+    },
+    "Q4_0": {
+      "vram_factor": 0.35,
+      "quality": "medium",
+      "speed": "fast"
+    },
+    "Q4_K_S": {
+      "vram_factor": 0.38,
+      "quality": "good",
+      "speed": "fast"
+    },
+    "Q4_K_M": {
+      "vram_factor": 0.4,
+      "quality": "good",
+      "speed": "fast"
+    },
+    "Q4_K": {
+      "vram_factor": 0.42,
+      "quality": "good",
+      "speed": "fast"
+    },
+    "Q5_0": {
+      "vram_factor": 0.45,
+      "quality": "high",
+      "speed": "medium"
+    },
+    "Q5_K_S": {
+      "vram_factor": 0.48,
+      "quality": "high",
+      "speed": "medium"
+    },
+    "Q5_K_M": {
+      "vram_factor": 0.5,
+      "quality": "high",
+      "speed": "medium"
+    },
+    "Q5_K": {
+      "vram_factor": 0.52,
+      "quality": "high",
+      "speed": "medium"
+    },
+    "Q6_K": {
+      "vram_factor": 0.6,
+      "quality": "very_high",
+      "speed": "medium"
+    },
+    "Q8_0": {
+      "vram_factor": 0.75,
+      "quality": "near_lossless",
+      "speed": "slow"
+    },
+    "IQ1_S": {
+      "vram_factor": 0.18,
+      "quality": "low",
+      "speed": "fastest"
+    },
+    "IQ2_S": {
+      "vram_factor": 0.22,
+      "quality": "medium",
+      "speed": "fast"
+    },
+    "IQ3_S": {
+      "vram_factor": 0.26,
+      "quality": "medium",
+      "speed": "fast"
+    },
+    "IQ4_XS": {
+      "vram_factor": 0.32,
+      "quality": "good",
+      "speed": "medium"
+    },
+    "BF16": {
+      "vram_factor": 1.0,
+      "quality": "lossless",
+      "speed": "slowest"
+    },
+    "F16": {
+      "vram_factor": 1.0,
+      "quality": "lossless",
+      "speed": "slowest"
+    }
+  }
+}

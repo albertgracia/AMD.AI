@@ -1,0 +1,138 @@
+{
+  "version": "1.0",
+  "generated": "2026-09-05",
+  "description": "GPU-specific presets for local-ai-use skill. Auto-selected by detect_local.py based on deviceID/gfx_version.",
+  "presets": {
+    "rx9070": {
+      "device_id": "0x7550",
+      "name": "AMD Radeon RX 9070",
+      "vram_gb": 16,
+      "gfx_vulkan": "gfx1103",
+      "gfx_hip": "gfx1201",
+      "architecture": "RDNA 4",
+      "compute_units": 64,
+      "wave_size_vulkan": 64,
+      "wave_size_hip": 32,
+      "recommended_backend": "hip",
+      "notes": "RDNA 4 early enablement in ROCm. HIP kernels more mature than Vulkan for this gen. CPU (Zen 4) often faster for models ≤8GB.",
+      "vulkan": {
+        "driver_min": "2.0.395",
+        "vulkan_version": "1.4.357",
+        "flash_attention": true,
+        "matrix_cores": "KHR_coopmat",
+        "known_issues": ["Kernels not optimized for RDNA 4", "Wave64 suboptimal for some ops"]
+      },
+      "hip": {
+        "rocm_version": "7.2.0",
+        "runtime": "rocclr",
+        "compiler": "AMD clang 23.0.0git",
+        "flash_attention": "sdpa_fallback",
+        "mfma": true,
+        "wave32": true,
+        "known_issues": ["No rocprof in _rocm_sdk_devel", "GGML_HIP_EXPORT_METRICS=OFF in build"]
+      },
+      "model_presets": {
+        "qwen35_9b_q4k": {
+          "model": "Qwen3.5-9B-Q4_K",
+          "throughput": { "ngl": -1, "prompt": 512, "gen": 256, "batch": 2048, "fa": "auto", "cache": "q4_0", "decode_toks": 3617, "prefill_toks": 811 },
+          "latency": { "ngl": -1, "prompt": 2048, "gen": 256, "batch": 1024, "fa": "auto", "cache": "q4_0", "decode_toks": 3438, "prefill_toks": 1502 },
+          "balanced": { "ngl": -1, "prompt": 2048, "gen": 256, "batch": 2048, "fa": "auto", "cache": "q4_0", "decode_toks": 3405, "prefill_toks": 1556 },
+          "max_context": { "ngl": -1, "prompt": 2048, "gen": 256, "batch": 2048, "fa": "auto", "cache": "q4_0", "ctx": 65536 },
+          "memory_efficient": { "ngl": -1, "prompt": 512, "gen": 256, "batch": 2048, "fa": "auto", "cache": "q4_0", "decode_toks": 3543, "prefill_toks": 753 },
+          "cpu_only": { "ngl": 0, "prompt": 512, "gen": 256, "batch": 2048, "fa": "off", "cache": "q4_0", "decode_toks": 27454, "prefill_toks": 1556 }
+        },
+        "qwen38_27b_q3k": {
+          "model": "Qwen3.8-27B-Q3_K",
+          "throughput": { "ngl": -1, "prompt": 512, "gen": 256, "batch": 2048, "fa": "auto", "cache": "q4_0", "decode_toks": 15888, "prefill_toks": 1807 },
+          "latency": { "ngl": -1, "prompt": 2048, "gen": 256, "batch": 1024, "fa": "auto", "cache": "q4_0", "decode_toks": 15500, "prefill_toks": 3200 },
+          "balanced": { "ngl": -1, "prompt": 2048, "gen": 256, "batch": 2048, "fa": "auto", "cache": "q4_0", "decode_toks": 15800, "prefill_toks": 1800 },
+          "hybrid": { "ngl": 20, "prompt": 512, "gen": 256, "batch": 1024, "fa": "auto", "cache": "q4_0" }
+        }
+      },
+      "scaling_limits": {
+        "batch_size_optimal": [1024, 2048],
+        "batch_size_max_efficiency": 1024,
+        "batch_size_saturation": 4096,
+        "ngl_cpu_better": 30,
+        "ngl_hybrid_sweet_spot": [10, 20],
+        "prompt_size_linear_max": 8192
+      }
+    },
+    "rx7900xtx": {
+      "device_id": "0x744C",
+      "name": "AMD Radeon RX 7900 XTX",
+      "vram_gb": 24,
+      "gfx_vulkan": "gfx1100",
+      "gfx_hip": "gfx1100",
+      "architecture": "RDNA 3",
+      "compute_units": 96,
+      "recommended_backend": "hip",
+      "notes": "RDNA 3 well supported in ROCm 6.0+. 24GB VRAM handles larger models.",
+      "model_presets": {
+        "qwen35_9b_q4k": {
+          "balanced": { "ngl": -1, "prompt": 2048, "gen": 256, "batch": 2048, "fa": "auto", "cache": "q4_0" }
+        },
+        "llama31_70b_q4k": {
+          "balanced": { "ngl": -1, "prompt": 2048, "gen": 256, "batch": 1024, "fa": "auto", "cache": "q4_0" }
+        }
+      }
+    },
+    "rx7900xt": {
+      "device_id": "0x744D",
+      "name": "AMD Radeon RX 7900 XT",
+      "vram_gb": 20,
+      "gfx_vulkan": "gfx1100",
+      "gfx_hip": "gfx1100",
+      "architecture": "RDNA 3",
+      "compute_units": 84,
+      "recommended_backend": "hip"
+    },
+    "mi300x": {
+      "device_id": "0x74A1",
+      "name": "AMD Instinct MI300X",
+      "vram_gb": 192,
+      "gfx_vulkan": "gfx942",
+      "gfx_hip": "gfx942",
+      "architecture": "CDNA 3",
+      "compute_units": 304,
+      "recommended_backend": "hip",
+      "notes": "Datacenter GPU. Use `serving-llms-on-instinct` skill for production deployment.",
+      "model_presets": {
+        "llama31_405b_q4k": { "balanced": { "ngl": -1, "prompt": 4096, "gen": 512, "batch": 2048, "fa": "auto", "cache": "q4_0" } },
+        "deepseek_v3_q4k": { "balanced": { "ngl": -1, "prompt": 4096, "gen": 512, "batch": 2048, "fa": "auto", "cache": "q4_0" } }
+      }
+    },
+    "ryzen_ai_phoenix": {
+      "device_id": "0x1502",
+      "name": "AMD Ryzen AI (Phoenix)",
+      "vram_gb": "shared",
+      "gfx_vulkan": "gfx1103",
+      "gfx_hip": "unsupported",
+      "architecture": "RDNA 3 / XDNA",
+      "recommended_backend": "vulkan",
+      "notes": "Integrated GPU with shared memory. Vulkan only. Use `local-ai-use` for Vulkan, NPU needs separate skill.",
+      "model_presets": {
+        "qwen35_9b_q4k": { "balanced": { "ngl": -1, "prompt": 1024, "gen": 256, "batch": 512, "fa": "auto", "cache": "q4_0" } }
+      }
+    },
+    "epyc_genoa": {
+      "name": "AMD EPYC 9004 (Genoa)",
+      "vram_gb": "system",
+      "gfx_vulkan": "none",
+      "gfx_hip": "none",
+      "architecture": "Zen 4",
+      "recommended_backend": "cpu",
+      "notes": "CPU-only inference. Use `serving-llms-on-epyc` skill. Excellent AVX-512/VNNI performance.",
+      "model_presets": {
+        "qwen35_9b_q4k": { "cpu_only": { "ngl": 0, "prompt": 512, "gen": 256, "batch": 2048, "fa": "off", "cache": "f16" } }
+      }
+    }
+  },
+  "backend_selection_rules": [
+    { "condition": "gfx_version_hip in [gfx942, gfx940]", "backend": "hip", "skill": "serving-llms-on-instinct" },
+    { "condition": "gfx_version_hip == gfx1100", "backend": "hip", "reason": "RDNA 3 full ROCm support" },
+    { "condition": "gfx_version_hip == gfx1201", "backend": "hip", "reason": "RDNA 4 HIP more mature than Vulkan" },
+    { "condition": "gfx_version_vulkan == gfx1103 and no_hip", "backend": "vulkan", "reason": "RDNA 4 integrated/limited ROCm" },
+    { "condition": "no_gpu", "backend": "cpu", "reason": "CPU fallback" }
+  ]
+}
